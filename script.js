@@ -1,4 +1,5 @@
 var allMigrantStock;
+var areaNotConsidered;
 
 function createBarChart(selectedDimension) {
 
@@ -11,45 +12,51 @@ function createBarChart(selectedDimension) {
     var totali=[];
     var somma=0;
     var count=0;
-    var ypad = 100;
+    var ypad = 120;
+    var emigr = [];
     
     allMigrantStock.forEach(function (d){
-        if (d[selectedDimension]=="..") d[selectedDimension]="0";
-        d[selectedDimension] = parseInt((d[selectedDimension]).replace(/\./g,''));
 
-        if (d.major_area!="") {
+        if (typeof(d[selectedDimension])!='number'){
+            if (d[selectedDimension]=="..") d[selectedDimension]="0";
+            d[selectedDimension] = parseInt((d[selectedDimension]).replace(/\./g,''));
+        }
+
+        if (!(areaNotConsidered.includes(d.major_area)) && d.major_area!="") {
             somma+=d[selectedDimension];
             if (d[selectedDimension]!=0) count+=1;
-    }
+        }
+
     });
 
     var media=somma/count;
-    //console.log(somma + " " + count)
-    allMigrantStock.forEach(function (d) {
 
-        //d[selectedDimension] = parseInt((d[selectedDimension]).replace(/\./g,''));
+    allMigrantStock.forEach(function (d) {
         
         if(d.major_area=="WORLD"){            
-            totali.push(d[selectedDimension] )
+            totali.push(d[selectedDimension])
         }
         
-        if(d[selectedDimension]>(media) && d.year=="1990"){
-            immigrati.push(d[selectedDimension])
-            stati.push(d.major_area)
+        if(d[selectedDimension]>=(media)){
+            if (d.year=="1990" && !(areaNotConsidered.includes(d.major_area))){
+                
+                emigr.push({ migrant_number: d[selectedDimension], migrant_area: d.major_area })
+
+            }
         }
     });
 
     //---BAR CHART
 
     var xScale = d3.scaleBand()
-        .domain(stati.map(function(d) { 
-            return d; 
+        .domain(emigr.map(function(d) { 
+            return d.migrant_area; 
         }))
         .range([svgBarBounds.height, 0]);
 
     var yScale = d3.scaleLinear()
-        .domain([0, d3.max(allMigrantStock, function (d) {
-            return d[selectedDimension];
+        .domain([0, d3.max(emigr, function (d) {
+            return d.migrant_number;
         })])
         .range([svgBarBounds.width, 0]);
 
@@ -58,19 +65,19 @@ function createBarChart(selectedDimension) {
 
     var bars = d3.select("#bars")
         .selectAll("rect")
-        .data(immigrati)   
+        .data(emigr)   
 
     bars.attr("height",  function(d){return (20)})
-        .attr("y", function(d,i){return (-20*i)})
-        .attr("width",  function(d){return ((svgBarBounds.width)-yScale(d))})
-        .attr('val', function(d) {return d})
+        .attr("y", function(d,i){return (-xScale(d.migrant_area)-20)})
+        .attr("width",  function(d){return ((svgBarBounds.width)-yScale(d.migrant_number))})
+        .attr('val', function(d) {return d.migrant_number})
 
     bars.enter().append("rect")    
         .attr("height",  function(d){return (20)})
         .attr("x", ypad)
-        .attr("y", function(d,i){return (-20*i)})
-        .attr("width",  function(d){ return ((svgBarBounds.width)-yScale(d))})
-        .attr('val', function(d) {return d})
+        .attr("y", function(d,i){return (-xScale(d.migrant_area)-20)})
+        .attr("width",  function(d){ return ((svgBarBounds.width)-yScale(d.migrant_number))})
+        .attr('val', function(d) {return d.migrant_number})
         .attr("class", "rectStairCase")
 
     bars.exit().remove()
@@ -111,6 +118,22 @@ function chooseData(v) {
 }
 
 // Load CSV file
+d3.csv("data/MajorArea.csv", function (error, csv) {
+        if (error) { 
+        console.log(error);  //Log the error.
+    throw error;
+    }
+
+    areaNotConsidered=[];
+    
+    csv.forEach(function(d){
+        areaNotConsidered.push(d.MajorArea);
+    });
+
+console.log(areaNotConsidered);
+
+});
+
 d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, csv) {
     if (error) { 
         console.log(error);  //Log the error.
@@ -118,17 +141,19 @@ d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, c
     }
 
     csv.forEach(function (d) {
+
         d.year = d.Year;
         d.major_area = d.MajorArea;
         d.stato=[];
         d.valore=[];
+        
         Object.keys(d).forEach(function(key) {
             if (d[key]!=".." && key!="MajorArea" && key!="Year" && key!="Total" && key!="total" && key!="year" && key!="major_area" && key!="stato" && key!="valore"){
             value=(d[key]).replace(/\./g,'');
             value = parseInt(value);
             d.stato.push(key);
             d.valore.push(value);
-        }
+            }
         })
     });
 
@@ -138,6 +163,4 @@ d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, c
     createBarChart('Italy');
 
     console.log(allMigrantStock);
-
-
 });
