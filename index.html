@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Visualization - Homework 3</title>
+    <link rel="stylesheet" href="styles.css?version=1">
+    <script type="text/javascript" src="d3/d3.js"></script>
+    <script type="text/javascript" src="d3/d3-selection-multi.js"></script>
+    <script type="text/javascript" src="d3/topojson.js"></script>
+    <!--
+    <link rel="stylesheet" href="styles.css"/>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+    !-->  
+    <style type="text/css">
+        
+        .rectStairCase{
+            transform: scale(1, -1);
+            fill: #BF4100;
+            stroke-width:1;
+            stroke:rgb(0,0,0);
+        }
+
+    </style> 
+        
+</head>
+
+<body >
+
+<header>
+    <h1>Migrant Stock</h1>
+</header>
+
+<div id="details" class="view">
+    <h2 id="edition">Indice</h2>
+</div>
+
+<div id="map-view" class="view">
+    <h2>Chort Chart</h2>
+    <svg width="400" height="30">
+    </svg>
+
+    <svg width="90" height="60">
+        <g id="map"></g>
+        <g id="points"></g>
+    </svg>
+</div>
+
+<div id="bar-chart" class="view">
+    <h2 class="">Bar Chart</h2>
+    <div id="plot-selector">
+        <label>Plot:</label>
+        <select id="dataset" onchange="chooseData(this.options[this.selectedIndex].value)">
+            <option selected value="Italy">Italy</option>
+            <option value="Eritrea">Eritrea</option>
+        </select>
+    </div>
+
+    <svg width="500" height="500" id="barChart">
+        <g id="xAxis" class="axis"></g>
+        <g id="yAxis" class="axis"></g>
+        <g id="bars"></g>
+    </svg>
+</div>
+
+<div id="line-chart" class="view">
+    <h2 class="">Line Chart</h2>
+    <div id="plot-selector1">
+        <label>Plot:</label>
+        <select id="dataset1" onchange="chooseDataLineChart(this.options[this.selectedIndex].value)">
+            <option selected value="Italy">Italy</option>
+            <option value="Eritrea">Eritrea</option>
+        </select>
+    </div>
+
+    <svg width="500" height="500" id="lineChart">
+        <g id="xLineAxis" class="axis"></g>
+        <g id="yLineAxis" class="axis"></g>
+        <g id="lines"></g>
+    </svg>
+</div>
+
+
+<script type="application/javascript" src="script.js?version=1"></script>
+
+</body>
+</html>
