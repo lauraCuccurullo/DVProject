@@ -1,19 +1,25 @@
 var allMigrantStock;
 var areaNotConsidered;
+var media;
+var totalEmigrInYear = [];
+var emigrInYear = [];
+var emigrInState = [];
+var xLineGenerator;
+var yLinepad=60;
+var xLinepad=30;
 
 function createBarChart(selectedDimension) {
 
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
 
-    
-    var immigrati=[];
-    var stati=[];
-    var totali=[];
     var somma=0;
     var count=0;
     var ypad = 120;
-    var emigr = [];
+    emigrInState = [];
+    totalEmigrInYear = [];
+    emigrInYear = [];
+    media=0
     
     allMigrantStock.forEach(function (d){
 
@@ -29,33 +35,45 @@ function createBarChart(selectedDimension) {
 
     });
 
-    var media=somma/count;
+    media=somma/count;
+    var statesInMedia=[];
+
+    allMigrantStock.forEach(function (d) {
+
+        if(d[selectedDimension]>=(media) && !(statesInMedia.includes(d.major_area))) 
+            statesInMedia.push(d.major_area);
+    });
 
     allMigrantStock.forEach(function (d) {
         
-        if(d.major_area=="WORLD"){            
-            totali.push(d[selectedDimension])
+        if(d.major_area=="WORLD"){         
+            totalEmigrInYear.push({ migrant_number: d[selectedDimension], migrant_year: d.year})
         }
         
-        if(d[selectedDimension]>=(media)){
-            if (d.year=="1990" && !(areaNotConsidered.includes(d.major_area))){
-                
-                emigr.push({ migrant_number: d[selectedDimension], migrant_area: d.major_area })
+        if(statesInMedia.includes(d.major_area)){
 
+            if (!(areaNotConsidered.includes(d.major_area))){
+
+                emigrInYear.push({migrant_number: d[selectedDimension], migrant_area: d.major_area, migrant_year: d.year})
+
+                if (d.year=="1990"){ 
+                    emigrInState.push({ migrant_number: d[selectedDimension], migrant_area: d.major_area })
+                }
             }
+            
         }
     });
 
     //---BAR CHART
 
     var xScale = d3.scaleBand()
-        .domain(emigr.map(function(d) { 
+        .domain(emigrInState.map(function(d) { 
             return d.migrant_area; 
         }))
         .range([svgBarBounds.height, 0]);
 
     var yScale = d3.scaleLinear()
-        .domain([0, d3.max(emigr, function (d) {
+        .domain([0, d3.max(emigrInState, function (d) {
             return d.migrant_number;
         })])
         .range([svgBarBounds.width, 0]);
@@ -65,7 +83,7 @@ function createBarChart(selectedDimension) {
 
     var bars = d3.select("#bars")
         .selectAll("rect")
-        .data(emigr)   
+        .data(emigrInState)   
 
     bars.attr("height",  function(d){return (20)})
         .attr("y", function(d,i){return (-xScale(d.migrant_area)-20)})
@@ -85,29 +103,52 @@ function createBarChart(selectedDimension) {
     //---LINE CHART
 
     var iScale = d3.scaleLinear()
-        .domain([0, totali.length])
+        .domain([0, Object.keys(totalEmigrInYear).length])
         .range([0, svgLineBounds.width]);
 
-    var xLineScale = d3.scaleLinear()
-        .domain([0, d3.max(totali, function (d) {
-            return d;
-        })])
-        .range([svgLineBounds.height, 0]);
+    var xLineScale = d3.scaleBand()
+        .domain(totalEmigrInYear.map ( function (d) {
+            return d.migrant_year;
+        }))
+        .range([svgLineBounds.width,0]);
 
-    var xLineGenerator = d3.line()
+    var yLineScale = d3.scaleLinear()
+        .domain([0, d3.max(totalEmigrInYear, function (d) {
+            return d.migrant_number;
+        })])
+        .range([svgLineBounds.height-xLinepad, 0]);
+
+    xLineGenerator = d3.line()
         .x(function (d, i) {
-            return (iScale(i));
+            return (yLinepad+iScale(i));
         })
         .y(function (d) {
-            return (svgLineBounds.width-xLineScale(d));
+            return (yLineScale(d.migrant_number));
         });
 
-    var lines = d3.select("#lineChart");
+    var xAxis = d3.select("#xLineAxis")
+        .call(d3.axisBottom()
+            .scale(xLineScale))
+        .attr("transform", "translate ("+yLinepad+", " + (svgLineBounds.height-xLinepad) +")");
+
+    d3.select("#xAxis").selectAll("text")
+        .attr("transform", "rotate(90)")
+        .style("text-anchor", "start")
+        .attr("x", 9)
+        .attr("y", 0)
+        .attr("dy", ".35em")
+
+    var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
+        .attr("transform", "translate (" + (yLinepad) +", 0)");
+
+    var lines = d3.select("#lines");
     
     lines.selectAll("polyline").remove();
     lines.selectAll("path").remove();
     
-    lines.datum(totali).append("path")
+    lines.datum(totalEmigrInYear).append("path")
+       .attr("class", "line")
+       .attr('val', function(d) {return d.migrant_number})
        .attr("d", xLineGenerator);
 }
 
@@ -115,6 +156,22 @@ function chooseData(v) {
 
     createBarChart(v);
 
+}
+
+function chooseDataLineChart(v){
+    
+    var lines = d3.select("#lines");
+    var chosenEmigr=[]
+    var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
+    
+    emigrInYear.forEach(function (d) {
+        if (d.migrant_area==v) chosenEmigr.push({ migrant_number: d.migrant_number, migrant_year: d.migrant_year})
+    });
+
+    lines.datum(chosenEmigr).append("path")
+       .attr("class", "line")
+       .attr('val', function(d) {return d.migrant_number})
+       .attr("d", xLineGenerator);
 }
 
 // Load CSV file
@@ -129,9 +186,6 @@ d3.csv("data/MajorArea.csv", function (error, csv) {
     csv.forEach(function(d){
         areaNotConsidered.push(d.MajorArea);
     });
-
-console.log(areaNotConsidered);
-
 });
 
 d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, csv) {
