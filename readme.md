@@ -1,4 +1,4 @@
-# Homework 3
+# Final Project
 
 In this assignment you will create a bar chart, a map, and an info panel that are linked to each other and display statistics from Fifa World Cup Games dating back to 1930. The data comes from [FIFA's website](http://www.fifa.com/fifa-tournaments/statistics-and-records/worldcup/).
 
