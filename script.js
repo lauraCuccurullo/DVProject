@@ -40,7 +40,7 @@ function createBarChart(selectedDimension) {
 
     allMigrantStock.forEach(function (d) {
 
-        if(d[selectedDimension]>=(media) && !(statesInMedia.includes(d.major_area))) 
+        if(d[selectedDimension]>=(media) && !(statesInMedia.includes(d.major_area)) && !(areaNotConsidered.includes(d.major_area))) 
             statesInMedia.push(d.major_area);
     });
 
@@ -52,13 +52,10 @@ function createBarChart(selectedDimension) {
         
         if(statesInMedia.includes(d.major_area)){
 
-            if (!(areaNotConsidered.includes(d.major_area))){
+            emigrInYear.push({migrant_number: d[selectedDimension], migrant_area: d.major_area, migrant_year: d.year})
 
-                emigrInYear.push({migrant_number: d[selectedDimension], migrant_area: d.major_area, migrant_year: d.year})
-
-                if (d.year=="1990"){ 
-                    emigrInState.push({ migrant_number: d[selectedDimension], migrant_area: d.major_area })
-                }
+            if (d.year=="1990"){ 
+                emigrInState.push({ migrant_number: d[selectedDimension], migrant_area: d.major_area })
             }
             
         }
