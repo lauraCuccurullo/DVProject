@@ -7,18 +7,23 @@ var emigrInState = [];
 var xLineGenerator;
 var yLinepad=60;
 var xLinepad=30;
+var ageMigrantStock;
+var agePercentage=[]
 
 function createBarChart(selectedDimension) {
 
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
-    var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
+    var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();   
+    var svgPieBounds = d3.select("#pieChart").node().getBoundingClientRect();
 
+    var chosenYear= "1990";
     var somma=0;
     var count=0;
     var ypad = 120;
     emigrInState = [];
     totalEmigrInYear = [];
     emigrInYear = [];
+    agePercentage=[];
     media=0
     
     allMigrantStock.forEach(function (d){
@@ -60,6 +65,16 @@ function createBarChart(selectedDimension) {
             
         }
     });
+
+    ageMigrantStock.forEach(function(d){
+
+        if(d.MajorArea==selectedDimension && d.Year==chosenYear){ 
+            agePercentage.push(d.sectionOne)
+            agePercentage.push(d.sectionTwo)
+            agePercentage.push(d.sectionThree)
+            agePercentage.push(d.sectionFour)
+        }
+    })
 
     //---BAR CHART
 
@@ -147,6 +162,31 @@ function createBarChart(selectedDimension) {
        .attr("class", "line")
        .attr('val', function(d) {return d.migrant_number})
        .attr("d", xLineGenerator);
+
+    //---PIE CHART
+    d3.select("#pie").selectAll("path").remove(); 
+
+    var outerRadius = svgPieBounds.width / 2;
+    var innerRadius = 0;
+
+    var arc = d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(outerRadius);
+
+    var pie = d3.pie();
+
+    var pieChart = d3.select("#pie") 
+            .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+    var colors = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#a05d56", "#ff8c00"]);
+
+    var arcs = pieChart.selectAll("path")
+              .data(pie(agePercentage))
+              .enter(); 
+
+    arcs.append("path")
+        .attr("fill", function(d,i) { return colors(i); })
+        .attr("d", arc);
 }
 
 function chooseData(v) {
@@ -171,7 +211,7 @@ function chooseDataLineChart(v){
        .attr("d", xLineGenerator);
 }
 
-// Load CSV file
+// Load CSV file on area 
 d3.csv("data/MajorArea.csv", function (error, csv) {
         if (error) { 
         console.log(error);  //Log the error.
@@ -185,6 +225,46 @@ d3.csv("data/MajorArea.csv", function (error, csv) {
     });
 });
 
+// Load CSV file on migrant age
+d3.csv("data/UN_MigrantStockByAge_2017.csv", function (error, csv) {
+        if (error) { 
+        console.log(error);  //Log the error.
+    throw error;
+    }
+    
+    csv.forEach(function (d) {
+
+        d.sectionOne= +(d["0-4"]);
+        d.sectionOne+= +(d["5-9"]);
+        d.sectionOne+= +(d["10-14"]);
+        d.sectionOne= (Math.round(d.sectionOne*10))/10;
+
+        d.sectionTwo= +(d["15-19"]);
+        d.sectionTwo+= +(d["20-24"]);
+        d.sectionTwo+= +(d["25-29"]);
+        d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
+
+        d.sectionThree= +(d["30-34"]);
+        d.sectionThree+= +(d["35-39"]);
+        d.sectionThree+= +(d["40-44"]);
+        d.sectionThree+= +(d["45-49"]);
+        d.sectionThree+= +(d["50-54"]);
+        d.sectionThree= (Math.round(d.sectionThree*10))/10;
+
+        d.sectionFour= +(d["55-59"]);
+        d.sectionFour+= +(d["60-64"]);
+        d.sectionFour+= +(d["65-69"]);
+        d.sectionFour+= +(d["70-74"]);
+        d.sectionFour+= +(d["75+"]);
+        d.sectionFour= (Math.round(d.sectionFour*10))/10;
+
+    })
+
+    ageMigrantStock=csv;
+    console.log(ageMigrantStock);
+
+});
+
 d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, csv) {
     if (error) { 
         console.log(error);  //Log the error.
@@ -193,7 +273,7 @@ d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, c
 
     csv.forEach(function (d) {
 
-        d.year = d.Year;
+        d.year = +d.Year;
         d.major_area = d.MajorArea;
         d.stato=[];
         d.valore=[];
