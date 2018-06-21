@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="styles.css"/>
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
-    !-->  
+    !-->
     <style type="text/css">
 
         .line{
@@ -20,7 +20,7 @@
             stroke:steelblue;
             stroke-width:1.5px;
         }
-        
+
         .rectStairCase{
             transform: scale(1, -1);
             fill: #BF4100;
@@ -28,8 +28,8 @@
             stroke:rgb(0,0,0);
         }
 
-    </style> 
-        
+    </style>
+
 </head>
 
 <body >
@@ -60,7 +60,7 @@
         <select id="dataset" onchange="chooseData(this.options[this.selectedIndex].value)">
             <option selected value="Italy">Italy</option>
             <option value="Eritrea">Eritrea</option>
-            <option value="Germany">Germany</option>
+            <option value="France">France</option>
         </select>
     </div>
 
@@ -93,7 +93,7 @@
 
 <div id="area-chart" class="view">
     <h2 class="">Area Chart</h2>
-    <div id="plot-selector-area">        
+    <div id="plot-selector-area">
     </div>
 
     <svg width="500" height="300" id="lineChart">
