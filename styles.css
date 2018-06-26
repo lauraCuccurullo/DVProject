@@ -113,24 +113,24 @@ header {
 
 #chort-chart {
     float: left;
-    width: 600px;
-    height: 600px;
+    width: 550px;
+    height: 550px;
     border-width: 1px;
     border-color: #d9d9d9;
 }
 
 #bar-chart {
     float: left;
-    width: 500px;
-    height: 600px;
+    width: 550px;
+    height: 550px;
     margin-right: 20px;
 
 }
 
 #line-chart {
     float: left;
-    width: 600px;
-    height: 600px;
+    width: 550px;
+    height: 550px;
     margin-right: 20px;
 
 }
@@ -138,8 +138,8 @@ header {
 
 #pie-chart {
     float: left;
-    width: 600px;
-    height: 600px;
+    width: 550px;
+    height: 550px;
     border-width: 1px;
     border-color: #d9d9d9;
 }

@@ -11,30 +11,9 @@ var ageMigrantStock;
 var agePercentage=[];
 var paesi;
 
-function createIndex(){
-    
-    console.log(paesi)
-
-    var continenti = d3.select("#paesi")
-        .selectAll("div")
-        .data(d3.map(paesi, function(d){return d.Area}).keys());
-
-    continenti.enter().append("div")
-        .text(function(d) { return d;})
-        .attr("text-anchor", "middle")
-        .on("click", function(d){
-                d3.select(this).style("color", "red")
-                //console.log(paesi.map(function(v){
-                 //   return v[d]
-                //}))
-
-                })
-
-    continenti.text(function(d){return d})
-    continenti.exit().remove()
-}
-
 function createBarChart(selectedDimension) {
+
+    console.log(selectedDimension)
 
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();   
@@ -223,6 +202,39 @@ function createBarChart(selectedDimension) {
     .attr("text-anchor", "middle")                          //center the text on it's origin
     .text(function(d, i) { return ageRange[i]; });  
 }
+
+//INDICE
+
+function expand(d, v) {
+  d3.select(d)
+    .on("click", null)
+    .append("ul")
+    .selectAll("li")
+    .data(d3.map(paesi, function(d){ if (d.Area==v) return d.State}).keys())
+    .enter().append("li")
+    .text(function(d) { return d})
+    .on("click", function (d) {createBarChart(d)})
+;
+}
+
+function createIndex(){
+
+    var continenti = d3.select("#paesi")
+        .selectAll("div")
+        .data(d3.map(paesi, function(d){return d.Area}).keys());
+
+    continenti.enter().append("div")
+        .text(function(d) { return d;})
+        .attr("text-anchor", "middle")
+        .on("click", function(d){
+            expand(this, d);
+        })
+
+    continenti.text(function(d){return d})
+    continenti.exit().remove()
+}
+
+//SCELTA E MODIFICA PARAMETRI
 
 function chooseData(v) {
 
