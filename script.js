@@ -8,7 +8,31 @@ var xLineGenerator;
 var yLinepad=60;
 var xLinepad=30;
 var ageMigrantStock;
-var agePercentage=[]
+var agePercentage=[];
+var paesi;
+
+function createIndex(){
+    
+    console.log(paesi)
+
+    var continenti = d3.select("#paesi")
+        .selectAll("div")
+        .data(d3.map(paesi, function(d){return d.Area}).keys());
+
+    continenti.enter().append("div")
+        .text(function(d) { return d;})
+        .attr("text-anchor", "middle")
+        .on("click", function(d){
+                d3.select(this).style("color", "red")
+                //console.log(paesi.map(function(v){
+                 //   return v[d]
+                //}))
+
+                })
+
+    continenti.text(function(d){return d})
+    continenti.exit().remove()
+}
 
 function createBarChart(selectedDimension) {
 
@@ -25,6 +49,7 @@ function createBarChart(selectedDimension) {
     emigrInYear = [];
     agePercentage=[];
     media=0
+    ageRange =["0-14", "15-29", "30-54", "55+"];
     
     allMigrantStock.forEach(function (d){
 
@@ -187,6 +212,16 @@ function createBarChart(selectedDimension) {
     arcs.append("path")
         .attr("fill", function(d,i) { return colors(i); })
         .attr("d", arc);
+
+    arcs.append("svg:text")                                     //add a label to each slice
+        .attr("transform", function(d) {                    //set the label's origin to the center of the arc
+        //we have to make sure to set these before calling arc.centroid
+        d.innerRadius = 0;
+        d.outerRadius =100;
+        return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+    })
+    .attr("text-anchor", "middle")                          //center the text on it's origin
+    .text(function(d, i) { return ageRange[i]; });  
 }
 
 function chooseData(v) {
@@ -210,6 +245,17 @@ function chooseDataLineChart(v){
        .attr('val', function(d) {return d.migrant_number})
        .attr("d", xLineGenerator);
 }
+
+// Load CSV file on paesi 
+d3.csv("data/paesi.csv", function (error, csv) {
+        if (error) { 
+        console.log(error);  //Log the error.
+    throw error;
+    }
+    
+    paesi = csv;
+    
+});
 
 // Load CSV file on area 
 d3.csv("data/MajorArea.csv", function (error, csv) {

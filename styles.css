@@ -89,21 +89,6 @@ header {
     height: 100px;
 }
 
-#logo {
-    float: right;
-    height: 100px;
-}
-
-#details {
-    float: left;
-    width: 200px;
-    padding: 0.5em;
-
-    border-width: 1px;
-    border-color: #d9d9d9;
-    border-right-style: solid;
-}
-
 #plot-selector {
     float: right;
     margin-bottom: 5px;
@@ -115,18 +100,48 @@ header {
 
 }
 
+#index {
+    float: left;
+    width: 250px;
+    height: 1000px;
+    padding: 0.5em;
+
+    border-width: 1px;
+    border-color: #d9d9d9;
+    border-right-style: solid;
+}
+
+#chort-chart {
+    float: left;
+    width: 600px;
+    height: 600px;
+    border-width: 1px;
+    border-color: #d9d9d9;
+}
+
 #bar-chart {
     float: left;
     width: 500px;
+    height: 600px;
     margin-right: 20px;
 
 }
 
-#world-map {
+#line-chart {
     float: left;
+    width: 600px;
+    height: 600px;
+    margin-right: 20px;
+
+}
+
+
+#pie-chart {
+    float: left;
+    width: 600px;
+    height: 600px;
     border-width: 1px;
     border-color: #d9d9d9;
-    border-left-style: solid;
 }
 
 
@@ -145,17 +160,3 @@ header {
     font-size: 14px;
 
 }
-
-/* Styles that clean up the layout;
- * you can ignore these: */
-
-/*div {*/
-/*display: inline-block;*/
-/*border: 1px solid lightgray;*/
-/*margin: 10px;*/
-/*}*/
-
-/*div,*/
-/*span {*/
-/*padding: 10px;*/
-/*}*/

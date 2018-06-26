@@ -32,24 +32,20 @@
         
 </head>
 
-<body >
+<body onload="createIndex()">
 
 <header>
     <h1>Migrant Stock</h1>
 </header>
 
-<div id="details" class="view">
+<div id="index" class="view">
     <h2 id="edition">Indice</h2>
+    <div id="paesi"></div>>
 </div>
 
-<div id="map-view" class="view">
+<div id="chort-chart" class="view">
     <h2>Chort Chart</h2>
-    <svg width="400" height="30">
-    </svg>
-
-    <svg width="90" height="60">
-        <g id="map"></g>
-        <g id="points"></g>
+    <svg width="200" height="200">
     </svg>
 </div>
 
@@ -91,7 +87,7 @@
     </svg>
 </div>
 
-<div id="area-chart" class="view">
+<div id="pie-chart" class="view">
     <h2 class="">Pie Chart</h2>
     <div id="plot-selector-pie">        
     </div>
