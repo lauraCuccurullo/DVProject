@@ -13,8 +13,6 @@ var paesi;
 
 function createBarChart(selectedDimension) {
 
-    console.log(selectedDimension)
-
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();   
     var svgPieBounds = d3.select("#pieChart").node().getBoundingClientRect();
@@ -206,15 +204,19 @@ function createBarChart(selectedDimension) {
 //INDICE
 
 function expand(d, v) {
-  d3.select(d)
+
+  var stati= d3.select(d)
     .on("click", null)
-    .append("ul")
-    .selectAll("li")
-    .data(d3.map(paesi, function(d){ if (d.Area==v) return d.State}).keys())
-    .enter().append("li")
-    .text(function(d) { return d})
-    .on("click", function (d) {createBarChart(d)})
-;
+    .selectAll("div")
+    .data(d3.map(paesi, function(d){ if (d.Area===v) return d.State}).keys());
+ stati
+    .enter().append("div")
+    .attr("class", "stati")
+    .text(function(d) { console.log(d + "ciao");return d})
+    .on("click", function (d) {createBarChart(d)});
+
+stati.text(function(d){return d})
+stati.exit().remove()
 }
 
 function createIndex(){
@@ -226,6 +228,7 @@ function createIndex(){
     continenti.enter().append("div")
         .text(function(d) { return d;})
         .attr("text-anchor", "middle")
+        .attr("class", "aree")
         .on("click", function(d){
             expand(this, d);
         })

@@ -144,6 +144,18 @@ header {
     border-color: #d9d9d9;
 }
 
+.aree{
+    border: 1px solid black;
+}
+
+.stati{
+    margin-left: 20px;
+}
+
+.stati:hover{
+    background-color: lightblue;
+}
+
 
 #links > line {
     stroke: rgb(216, 216, 216);
