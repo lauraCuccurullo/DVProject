@@ -95,6 +95,14 @@ function createBarChart(selectedDimension) {
     var yAxis = d3.select("#yAxis").call(d3.axisLeft().scale(xScale))
     .attr("transform", "translate (" + (ypad) +", 0)");
 
+    var colorScale= d3.scaleLinear()
+        .domain([0, d3.max(emigrInState, function (d) {
+           return d.migrant_number;
+        })])
+        .interpolate(d3.interpolateHcl)
+        .range([d3.rgb('#FFFFC2'),d3.rgb("#BF4100")]);
+
+
     var bars = d3.select("#bars")
         .selectAll("rect")
         .data(emigrInState)   
@@ -103,6 +111,7 @@ function createBarChart(selectedDimension) {
         .attr("y", function(d,i){return (-xScale(d.migrant_area)-20)})
         .attr("width",  function(d){return ((svgBarBounds.width)-yScale(d.migrant_number))})
         .attr('val', function(d) {return d.migrant_number})
+        .style('fill', function(d){return colorScale(d.migrant_number)})
 
     bars.enter().append("rect")    
         .attr("height",  function(d){return (20)})
@@ -111,6 +120,7 @@ function createBarChart(selectedDimension) {
         .attr("width",  function(d){ return ((svgBarBounds.width)-yScale(d.migrant_number))})
         .attr('val', function(d) {return d.migrant_number})
         .attr("class", "rectStairCase")
+        .style('fill', function(d){return colorScale(d.migrant_number)})
 
     bars.exit().remove()
 
@@ -180,7 +190,7 @@ function createBarChart(selectedDimension) {
     var pieChart = d3.select("#pie") 
             .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
-    var colors = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#a05d56", "#ff8c00"]);
+    var colors = d3.scaleOrdinal(["#f3e59d", "#e5c16e", "#d89941", "#c6590b"]);
 
     var arcs = pieChart.selectAll("path")
               .data(pie(agePercentage))
@@ -190,14 +200,13 @@ function createBarChart(selectedDimension) {
         .attr("fill", function(d,i) { return colors(i); })
         .attr("d", arc);
 
-    arcs.append("svg:text")                                     //add a label to each slice
-        .attr("transform", function(d) {                    //set the label's origin to the center of the arc
-        //we have to make sure to set these before calling arc.centroid
+    arcs.append("svg:text")                                     
+        .attr("transform", function(d) {                    
         d.innerRadius = 0;
         d.outerRadius =100;
-        return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+        return "translate(" + arc.centroid(d) + ")";       
     })
-    .attr("text-anchor", "middle")                          //center the text on it's origin
+    .attr("text-anchor", "middle")                          
     .text(function(d, i) { return ageRange[i]; });  
 }
 
@@ -207,28 +216,29 @@ function expand(d, v) {
 
   var stati= d3.select(d)
     .on("click", null)
-    .selectAll("div")
-    .data(d3.map(paesi, function(d){ if (d.Area===v) return d.State}).keys());
- stati
+    .selectAll(".stati")
+    .data(paesi)
     .enter().append("div")
     .attr("class", "stati")
-    .text(function(d) { console.log(d + "ciao");return d})
-    .on("click", function (d) {createBarChart(d)});
+    .text(function(d) { if (d.Area==v) return d.State})
+    .on("click", function (d) {createBarChart(d.State)});
 
-stati.text(function(d){return d})
-stati.exit().remove()
+    stati.text(function(d){ if (d.Area==v) return d.State})
+    stati.exit().remove()
 }
 
 function createIndex(){
 
     var continenti = d3.select("#paesi")
-        .selectAll("div")
+        .selectAll(".aree")
         .data(d3.map(paesi, function(d){return d.Area}).keys());
 
-    continenti.enter().append("div")
+    continenti.enter().append("div")    
+        .attr("class", "aree")
+        .append("a")
+        .attr("href", "#")
         .text(function(d) { return d;})
         .attr("text-anchor", "middle")
-        .attr("class", "aree")
         .on("click", function(d){
             expand(this, d);
         })
