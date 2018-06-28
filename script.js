@@ -8,7 +8,8 @@ var xLineGenerator;
 var yLinepad=60;
 var xLinepad=30;
 var ageMigrantStock;
-var agePercentage=[]
+var agePercentage=[];
+var paesi;
 
 function createBarChart(selectedDimension) {
 
@@ -25,6 +26,7 @@ function createBarChart(selectedDimension) {
     emigrInYear = [];
     agePercentage=[];
     media=0
+    ageRange =["0-14", "15-29", "30-54", "55+"];
     
     allMigrantStock.forEach(function (d){
 
@@ -93,6 +95,14 @@ function createBarChart(selectedDimension) {
     var yAxis = d3.select("#yAxis").call(d3.axisLeft().scale(xScale))
     .attr("transform", "translate (" + (ypad) +", 0)");
 
+    var colorScale= d3.scaleLinear()
+        .domain([0, d3.max(emigrInState, function (d) {
+           return d.migrant_number;
+        })])
+        .interpolate(d3.interpolateHcl)
+        .range([d3.rgb('#FFFFC2'),d3.rgb("#BF4100")]);
+
+
     var bars = d3.select("#bars")
         .selectAll("rect")
         .data(emigrInState)   
@@ -101,6 +111,7 @@ function createBarChart(selectedDimension) {
         .attr("y", function(d,i){return (-xScale(d.migrant_area)-20)})
         .attr("width",  function(d){return ((svgBarBounds.width)-yScale(d.migrant_number))})
         .attr('val', function(d) {return d.migrant_number})
+        .style('fill', function(d){return colorScale(d.migrant_number)})
 
     bars.enter().append("rect")    
         .attr("height",  function(d){return (20)})
@@ -109,6 +120,7 @@ function createBarChart(selectedDimension) {
         .attr("width",  function(d){ return ((svgBarBounds.width)-yScale(d.migrant_number))})
         .attr('val', function(d) {return d.migrant_number})
         .attr("class", "rectStairCase")
+        .style('fill', function(d){return colorScale(d.migrant_number)})
 
     bars.exit().remove()
 
@@ -178,7 +190,7 @@ function createBarChart(selectedDimension) {
     var pieChart = d3.select("#pie") 
             .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
-    var colors = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#a05d56", "#ff8c00"]);
+    var colors = d3.scaleOrdinal(["#f3e59d", "#e5c16e", "#d89941", "#c6590b"]);
 
     var arcs = pieChart.selectAll("path")
               .data(pie(agePercentage))
@@ -187,7 +199,55 @@ function createBarChart(selectedDimension) {
     arcs.append("path")
         .attr("fill", function(d,i) { return colors(i); })
         .attr("d", arc);
+
+    arcs.append("svg:text")                                     
+        .attr("transform", function(d) {                    
+        d.innerRadius = 0;
+        d.outerRadius =100;
+        return "translate(" + arc.centroid(d) + ")";       
+    })
+    .attr("text-anchor", "middle")                          
+    .text(function(d, i) { return ageRange[i]; });  
 }
+
+//INDICE
+
+function expand(d, v) {
+
+  var stati= d3.select(d)
+    .on("click", null)
+    .selectAll(".stati")
+    .data(paesi)
+    .enter().append("div")
+    .attr("class", "stati")
+    .text(function(d) { if (d.Area==v) return d.State})
+    .on("click", function (d) {createBarChart(d.State)});
+
+    stati.text(function(d){ if (d.Area==v) return d.State})
+    stati.exit().remove()
+}
+
+function createIndex(){
+
+    var continenti = d3.select("#paesi")
+        .selectAll(".aree")
+        .data(d3.map(paesi, function(d){return d.Area}).keys());
+
+    continenti.enter().append("div")    
+        .attr("class", "aree")
+        .append("a")
+        .attr("href", "#")
+        .text(function(d) { return d;})
+        .attr("text-anchor", "middle")
+        .on("click", function(d){
+            expand(this, d);
+        })
+
+    continenti.text(function(d){return d})
+    continenti.exit().remove()
+}
+
+//SCELTA E MODIFICA PARAMETRI
 
 function chooseData(v) {
 
@@ -210,6 +270,17 @@ function chooseDataLineChart(v){
        .attr('val', function(d) {return d.migrant_number})
        .attr("d", xLineGenerator);
 }
+
+// Load CSV file on paesi 
+d3.csv("data/paesi.csv", function (error, csv) {
+        if (error) { 
+        console.log(error);  //Log the error.
+    throw error;
+    }
+    
+    paesi = csv;
+    
+});
 
 // Load CSV file on area 
 d3.csv("data/MajorArea.csv", function (error, csv) {

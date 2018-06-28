@@ -13,29 +13,8 @@
     height: 15px;
 }
 
-.team {
-    fill: #fee8c8;
-}
-
-.team-html {
-    background-color: #fee8c8;
-}
-
 .host {
     fill: #2b8cbe;
-}
-
-.gold {
-    fill: #FFD700;
-    opacity: .8;
-    stroke: #252525;
-    stroke-width: 2px;
-}
-
-.silver {
-    fill: #d9d9d9;
-    opacity: .8;
-    stroke: #252525;
 }
 
 .selected {
@@ -50,8 +29,8 @@
 }
 
 @font-face {
-    font-family: 'dusha';
-    src: url('assets/dusha.ttf');
+    font-family: 'Shrikhand', cursive;
+    src: url('Shrikhand-Regular.ttf');
 }
 
 @font-face {
@@ -61,13 +40,13 @@
 
 h1 {
     margin-top: 0;
-    font-family: 'dusha';
-    color: #d20a11;
+    font-family: 'Shrikhand', cursive;
+    color: #008250;
 }
 
 h2 {
-    font-family: 'dusha';
-    color: #d20a11;
+    font-family: 'Shrikhand', cursive;
+    color: #008250;
     padding-bottom: 0px;
     margin-top: 3px;
     margin-bottom: 0px;
@@ -89,21 +68,6 @@ header {
     height: 100px;
 }
 
-#logo {
-    float: right;
-    height: 100px;
-}
-
-#details {
-    float: left;
-    width: 200px;
-    padding: 0.5em;
-
-    border-width: 1px;
-    border-color: #d9d9d9;
-    border-right-style: solid;
-}
-
 #plot-selector {
     float: right;
     margin-bottom: 5px;
@@ -115,20 +79,72 @@ header {
 
 }
 
+#index {
+    float: left;
+    width: 250px;
+    height: 1000px;
+    padding: 0.5em;
+
+    border-width: 1px;
+    border-color: #d9d9d9;
+    border-right-style: solid;
+}
+
+#chort-chart {
+    float: left;
+    width: 550px;
+    height: 550px;
+    border-width: 1px;
+    border-color: #d9d9d9;
+}
+
 #bar-chart {
     float: left;
-    width: 500px;
+    width: 550px;
+    height: 550px;
     margin-right: 20px;
 
 }
 
-#world-map {
+#line-chart {
     float: left;
-    border-width: 1px;
-    border-color: #d9d9d9;
-    border-left-style: solid;
+    width: 550px;
+    height: 550px;
+    margin-right: 20px;
+
 }
 
+
+#pie-chart {
+    float: left;
+    width: 550px;
+    height: 550px;
+    border-width: 1px;
+    border-color: #d9d9d9;
+}
+#barChart{
+    overflow: visible;
+}
+.aree{
+    background-color: #F1F1B4;
+}
+
+.aree:hover{
+    background-color: lightblue;
+}
+
+.stati{
+    margin-left: 20px;
+}
+
+.stati:hover{
+    background-color: lightblue;
+}
+
+a{
+    color: black;
+    text-decoration: none;
+}
 
 #links > line {
     stroke: rgb(216, 216, 216);
@@ -145,17 +161,3 @@ header {
     font-size: 14px;
 
 }
-
-/* Styles that clean up the layout;
- * you can ignore these: */
-
-/*div {*/
-/*display: inline-block;*/
-/*border: 1px solid lightgray;*/
-/*margin: 10px;*/
-/*}*/
-
-/*div,*/
-/*span {*/
-/*padding: 10px;*/
-/*}*/
