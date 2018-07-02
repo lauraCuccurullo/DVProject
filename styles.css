@@ -1,4 +1,6 @@
-
+.invisible{
+    display:none;
+}
 .countries {
     stroke: #f7f7f7;
     fill: #d9d9d9;
@@ -79,7 +81,7 @@ header {
 
 }
 
-#index {
+#index-container {
     float: left;
     width: 250px;
     height: 1000px;
@@ -122,22 +124,20 @@ header {
     border-width: 1px;
     border-color: #d9d9d9;
 }
-#barChart{
-    overflow: visible;
-}
-.aree{
+.areas{
     background-color: #F1F1B4;
+    cursor:pointer;
 }
 
-.aree:hover{
+.area-name:hover{
     background-color: lightblue;
 }
 
-.stati{
+.states{
     margin-left: 20px;
 }
 
-.stati:hover{
+.states:hover{
     background-color: lightblue;
 }
 
@@ -149,7 +149,6 @@ a{
 #links > line {
     stroke: rgb(216, 216, 216);
 }
-
 #xAxis path,
 #yAxis path {
     fill: none;
