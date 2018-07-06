@@ -10,13 +10,13 @@ Malawi,Eastern Africa
 Mauritius,Eastern Africa
 Mayotte,Eastern Africa
 Mozambique,Eastern Africa
-Reunion,Eastern Africa
+ReReunion,Eastern Africa
 Rwanda,Eastern Africa
 Seychelles,Eastern Africa
 Somalia,Eastern Africa
 South Sudan,Eastern Africa
 Uganda,Eastern Africa
-United Republic of Tanzania,Eastern Africa
+Tanzania,Eastern Africa
 Zambia,Eastern Africa
 Zimbabwe,Eastern Africa
 Angola,Middle Africa
@@ -43,7 +43,7 @@ Swaziland,Northern Africa
 Benin,Western Africa
 Burkina Faso,Western Africa
 Cabo Verde,Western Africa
-Côte d'Ivoire,Western Africa
+CoCote d'Ivoire,Western Africa
 Gambia,Western Africa
 Ghana,Western Africa
 Guinea,Western Africa
@@ -65,10 +65,10 @@ Uzbekistan,Central Asia
 China,Eastern Asia
 China Hong Kong SAR,Eastern Asia
 China Macao SAR,Eastern Asia
-Dem. People's Republic of Korea,Eastern Asia
+North Korea,Eastern Asia
 Japan,Eastern Asia
 Mongolia,Eastern Asia
-Republic of Korea,Eastern Asia
+South Korea,Eastern Asia
 Afghanistan,Southern Asia
 Bangladesh,Southern Asia
 Bhutan,Southern Asia
@@ -81,7 +81,7 @@ Sri Lanka,Southern Asia
 Brunei Darussalam,South-Eastern Asia
 Cambodia,South-Eastern Asia
 Indonesia,South-Eastern Asia
-Lao People's Democratic Republic,South-Eastern Asia
+Laos,South-Eastern Asia
 Malaysia,South-Eastern Asia
 Myanmar,South-Eastern Asia
 Philippines,South-Eastern Asia
@@ -207,7 +207,7 @@ Bermuda,Northern America
 Canada,Northern America
 Greenland,Northern America
 Saint Pierre and Miquelon,Northern America
-United States of America,Northern America
+USA,Northern America
 Australia,Oceania
 New Zealand,Oceania
 Melanesia,Oceania
