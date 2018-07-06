@@ -98,12 +98,18 @@ function update_charts(){
   createBarChart();
   createLineChart();
   createPieChart();
-  }
-
+}
+function getId(d,chart){
+    id="#"+chart+"-"+d;
+    return(id.replace(/ /g, "-"));
+}
+function newId(d,chart){
+    return(getId(d,chart).replace(/#/g, ""));
+}
 function createBarChart(){
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
-    var xBarpad = 150;
-    var yBarpad = 20;
+    var xBarpad = 100;
+    var yBarpad = 40;
     var yScale = d3.scaleBand()
         .domain(emigrInYear.map(function(d) {
             return d.migrant_area;
@@ -117,10 +123,15 @@ function createBarChart(){
         })])
         .range([0,svgBarBounds.width-2*xBarpad]);
 
-    var yAxis = d3.select("#yAxis").call(d3.axisLeft().scale(yScale).tickSizeOuter(0))
+    var yBarAxis = d3.select("#yBarAxis").call(d3.axisLeft().scale(yScale).tickSizeOuter(0))
         .attr("transform", "translate (" + (xBarpad) +", 0)")
         .selectAll("text")
-        .on("click",function(d){new_line(d);});
+        .on("click",function(d){
+              new_line(d);
+              d3.select(getId(d,"line"))
+                .classed("highlight",false);
+            })
+        .attr("transform", "rotate (30)")
 
     var colorScale= d3.scaleLinear()
         .domain([0, d3.max(emigrInYear, function (d) {
@@ -144,16 +155,12 @@ function createBarChart(){
         .attr("width",  function(d){return (xScale(d.migrant_number))})
         .attr('val', function(d) {return d.migrant_number})
         .classed("rect",true)
-        .attr("id",function(d){
-          id="bar-"+d.migrant_area;
-          return id.replace(/ /g, "-");})
+        .attr("id",function(d){return newId(d.migrant_area,"bar");})
         .attr("x", xBarpad)
         .style("fill", function(d){return colorScale(d.migrant_number)})
         .on("click",function(d){
               new_line(d.migrant_area);
-              id="#line-"+d.migrant_area;
-              id = id.replace(/ /g, "-");
-              line = d3.select(id)
+              line = d3.select(getId(d.migrant_area,"line"))
               line.classed("highlight", !line.classed("highlight"));
               });
     texts= d3.select("#bars")
@@ -176,8 +183,6 @@ function createBarChart(){
 function new_line(chosenState){
   if(!chosen_states.includes(chosenState)){
         chosen_states.push(chosenState)
-        id="line-"+chosenState;
-        id = id.replace(/ /g, "-");
         emigrFromState=[];
         emigrInState.forEach(function(d){
             if(d.migrant_area===chosenState)
@@ -187,7 +192,7 @@ function new_line(chosenState){
         d3.select("#lines")
         .append("path")
         .attr("class", "line")
-        .attr('id', id)
+        .attr('id', newId(chosenState,"line"))
         .attr("d", xLineGenerator(emigrFromState))
         .on("mouseover",function(){
               d3.select("#country-line")
@@ -326,11 +331,11 @@ function createIndex(){
         .data(continent_array);
 
     continenti.enter()
-        .append("div")
+        .append("span")
         .attr("class", "areas")
         .each(function(d){
           d3.select(this)
-            .append("div")
+            .append("span")
             .classed("area-name",true)
             .text(function(d) { return d;})
             .attr("text-anchor", "middle")
@@ -342,7 +347,7 @@ function createIndex(){
           d3.select(this)
             .selectAll(".states")
             .data(paesi.filter(function (p) { return (p.Area==d);}))
-            .enter().append("div")
+            .enter().append("span")
             .classed("state-name",true)
             .classed("invisible",true)
             .text(function(d) {return d.State})
