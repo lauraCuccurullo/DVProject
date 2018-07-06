@@ -1,33 +1,74 @@
+/*INDEX*/
+#index-container {
+    float: left;
+    width: 250px;
+    height: 1000px;
+    padding: 0.5em;
+
+    border-width: 1px;
+    border-color: #d9d9d9;
+    border-right-style: solid;
+}
 .invisible{
     display:none;
 }
-.countries {
-    stroke: #f7f7f7;
-    fill: #d9d9d9;
+.areas{
+    background-color: #F1F1B4;
+    cursor:pointer;
+}
+.state-name{
+    margin-left: 20px;
+}
+.area-name:hover,.state-name:hover{
+    background-color: lightblue;
+}
+/*BARCHART*/
+#bar-chart {
+    float: left;
+    width: 550px;
+    height: 550px;
+    margin-right: 20px;
+}
+#yAxis text {
+    font-size: 0.85em;
+    cursor: pointer;
+}
+.rect{
+    stroke-width:1;
+    stroke:black;
+    cursor: pointer;
+}
+.bar-tooltip{
+    font-family:sans-serif;
+    font-size:11px;
+    fill:black;
 }
 
-.mouseover{
-    fill: #ffa07a;
+/*LINECHART*/
+#line-chart {
+    float: left;
+    width: 550px;
+    height: 550px;
+    margin-right: 20px;
 }
-
-.legend-element {
-    width: 15px;
-    height: 15px;
+.line{
+    fill:none;
+    stroke:grey;
+    stroke-width:1
 }
-
-.host {
-    fill: #2b8cbe;
-}
-
-.selected {
-    fill: #d20a11;
-}
-
-/*Map grid style*/
 .grat {
     stroke: grey;
     stroke-width: 1px;
     opacity: .2;
+}
+.highlight{
+    stroke:red;
+    stroke-width:2px;
+}
+.line:hover{
+    stroke: blue;
+    stroke-width:3px;
+
 }
 
 @font-face {
@@ -60,7 +101,7 @@ h3 {
 }
 
 * {
-    font-family: 'aller';
+    font-family: 'Arial';
 }
 
 header {
@@ -81,16 +122,6 @@ header {
 
 }
 
-#index-container {
-    float: left;
-    width: 250px;
-    height: 1000px;
-    padding: 0.5em;
-
-    border-width: 1px;
-    border-color: #d9d9d9;
-    border-right-style: solid;
-}
 
 #chort-chart {
     float: left;
@@ -100,21 +131,7 @@ header {
     border-color: #d9d9d9;
 }
 
-#bar-chart {
-    float: left;
-    width: 550px;
-    height: 550px;
-    margin-right: 20px;
 
-}
-
-#line-chart {
-    float: left;
-    width: 550px;
-    height: 550px;
-    margin-right: 20px;
-
-}
 
 
 #pie-chart {
@@ -124,39 +141,12 @@ header {
     border-width: 1px;
     border-color: #d9d9d9;
 }
-.areas{
-    background-color: #F1F1B4;
-    cursor:pointer;
-}
 
-.area-name:hover{
-    background-color: lightblue;
-}
 
-.states{
-    margin-left: 20px;
-}
 
-.states:hover{
-    background-color: lightblue;
-}
 
-a{
-    color: black;
-    text-decoration: none;
-}
+
 
 #links > line {
     stroke: rgb(216, 216, 216);
-}
-#xAxis path,
-#yAxis path {
-    fill: none;
-    stroke: black;
-}
-
-#xAxis text,
-#yAxis text {
-    font-size: 14px;
-
 }

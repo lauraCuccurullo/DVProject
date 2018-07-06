@@ -2,34 +2,41 @@ var allMigrantStock;
 var areaNotConsidered;
 var media;
 var totalEmigrInYear = [];
-var emigrInYear = [];
 var emigrInState = [];
+var emigrInYear = [];
 var ageMigrantStock;
 var agePercentage=[];
 var paesi;
 var expanded_continents=[];
-var year="1990"
+var year="2017"
 var state="Italy"
+var chosen_states=[]
+
 
 function update_year(y){
   year=y;
-  emigrInState=[];
-  emigrInYear.forEach(function(d){
+  d3.selectAll(".selected-year")
+      .text(year);
+  emigrInYear=[];
+  emigrInState.forEach(function(d){
       if(d.migrant_year==year)
-          emigrInState.push({ migrant_number: d.migrant_number, migrant_area: d.migrant_area })
+          emigrInYear.push({ migrant_number: d.migrant_number, migrant_area: d.migrant_area })
   });
   createBarChart();
   createPieChart();
 }
 
-function update_state(selectedDimension) {
-    state=selectedDimension;
-
+function update_state(s){
+    state=s;
+    d3.selectAll(".selected-country")
+        .text(state);
+    d3.select("#country-line")
+        .text("");
     var somma=0;
     var count=0;
-    emigrInState = [];
-    totalEmigrInYear = [];
     emigrInYear = [];
+    totalEmigrInYear = [];
+    emigrInState = [];
     agePercentage=[];
     media=0
     ageRange =["0-14", "15-29", "30-54", "55+"];
@@ -38,14 +45,14 @@ function update_state(selectedDimension) {
 
         allMigrantStock.forEach(function (d){
 
-            if (typeof(d[selectedDimension])!='number'){
-                if (d[selectedDimension]=="..") d[selectedDimension]="0";
-                d[selectedDimension] = parseInt((d[selectedDimension]).replace(/\./g,''));
+            if (typeof(d[s])!='number'){
+                if (d[s]=="..") d[s]="0";
+                d[s] = parseInt((d[s]).replace(/\./g,''));
             }
 
             if (!(areaNotConsidered.includes(d.major_area)) && d.major_area!="") {
-                somma+=d[selectedDimension];
-                if (d[selectedDimension]!=0) count+=1;
+                somma+=d[s];
+                if (d[s]!=0) count+=1;
             }
 
         });
@@ -55,32 +62,32 @@ function update_state(selectedDimension) {
 
         allMigrantStock.forEach(function (d) {
 
-            if(d[selectedDimension]>=(media) && !(statesInMedia.includes(d.major_area)) && !(areaNotConsidered.includes(d.major_area)))
+            if(d[s]>=(media) && !(statesInMedia.includes(d.major_area)) && !(areaNotConsidered.includes(d.major_area)))
                 statesInMedia.push(d.major_area);
         });
 
         allMigrantStock.forEach(function (d) {
 
             if(d.major_area=="WORLD"){
-                totalEmigrInYear.push({ migrant_number: d[selectedDimension], migrant_year: d.year})
+                totalEmigrInYear.push({ migrant_number: d[s], migrant_year: d.year})
             }
 
             if(statesInMedia.includes(d.major_area)){
 
-                emigrInYear.push({migrant_number: d[selectedDimension], migrant_area: d.major_area, migrant_year: d.year})
+                emigrInState.push({migrant_number: d[s], migrant_area: d.major_area, migrant_year: d.year});
 
             }
         });
     ageMigrantStock.forEach(function(d){
 
-        if(d.MajorArea==selectedDimension && d.Year==year){
+        if(d.MajorArea==s && d.Year==year){
             agePercentage.push(d.sectionOne)
             agePercentage.push(d.sectionTwo)
             agePercentage.push(d.sectionThree)
             agePercentage.push(d.sectionFour)
         }
     })
-
+  chosen_states=[];
   update_year(year)
   createLineChart();
 
@@ -95,35 +102,28 @@ function update_charts(){
 
 function createBarChart(){
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
-    d3.select("#selected-country")
-        .text(state);
-
-    var xBarpad = 140;
-    var yBarpad = 10;
+    var xBarpad = 150;
+    var yBarpad = 20;
     var yScale = d3.scaleBand()
-        .domain(emigrInState.map(function(d) {
+        .domain(emigrInYear.map(function(d) {
             return d.migrant_area;
         }))
         .range([svgBarBounds.height-yBarpad, yBarpad])
         .paddingInner([0.2]);
 
     var xScale = d3.scaleLinear()
-        .domain([0, d3.max(emigrInState, function (d) {
+        .domain([0, d3.max(emigrInYear, function (d) {
             return d.migrant_number;
         })])
-        .range([xBarpad,svgBarBounds.width-xBarpad]);
+        .range([0,svgBarBounds.width-2*xBarpad]);
 
     var yAxis = d3.select("#yAxis").call(d3.axisLeft().scale(yScale).tickSizeOuter(0))
         .attr("transform", "translate (" + (xBarpad) +", 0)")
         .selectAll("text")
         .on("click",function(d){new_line(d);});
 
-    d3.select("#yAxis")
-      .selectAll("text")
-      .style("font-size","1vw");
-
     var colorScale= d3.scaleLinear()
-        .domain([0, d3.max(emigrInState, function (d) {
+        .domain([0, d3.max(emigrInYear, function (d) {
            return d.migrant_number;
         })])
         .interpolate(d3.interpolateHcl)
@@ -132,53 +132,76 @@ function createBarChart(){
 
     var bars = d3.select("#bars")
         .selectAll("rect")
-        .data(emigrInState)
-
-    bars.enter().append("rect")
+        .data(emigrInYear)
+    bars.exit().remove();
+    bars.enter().append("rect");
 
     d3.select("#bars")
         .selectAll("rect")
-        .data(emigrInState)
+        .data(emigrInYear)
         .attr("height", yScale.bandwidth())
         .attr("y", function(d){return (yScale(d.migrant_area))})
         .attr("width",  function(d){return (xScale(d.migrant_number))})
         .attr('val', function(d) {return d.migrant_number})
-        .attr("class", "rectStairCase")
+        .classed("rect",true)
+        .attr("id",function(d){
+          id="bar-"+d.migrant_area;
+          return id.replace(/ /g, "-");})
         .attr("x", xBarpad)
-        .style("fill", function(d){return colorScale(d.migrant_number)});
-    bars.exit().remove()
+        .style("fill", function(d){return colorScale(d.migrant_number)})
+        .on("click",function(d){
+              new_line(d.migrant_area);
+              id="#line-"+d.migrant_area;
+              id = id.replace(/ /g, "-");
+              line = d3.select(id)
+              line.classed("highlight", !line.classed("highlight"));
+              });
+    texts= d3.select("#bars")
+        .selectAll("text")
+        .data(emigrInYear);
+    texts.enter().append("text");
+    texts.exit().remove();
+    d3.select("#bars")
+        .selectAll("text")
+        .data(emigrInYear)
+        .classed("bar-tooltip",true)
+        .attr("y", function(d){return yScale(d.migrant_area)+(yScale.bandwidth()/2)})
+        .attr("x", function(d){return xScale(d.migrant_number)+xBarpad+10})
+        .text(function(d){return d.migrant_number;});
+
+
 }
 //---LINE Chart
 
 function new_line(chosenState){
-    if(chosenState===null){
-        d3.select("#lines")
-          .selectAll("path")
-          .remove();
-        d3.select("#lines")
-          //.datum(totalEmigrInYear)
-          .append("path")
-          .attr("class", "line")
-          //.attr('val', function(d) {return d.migrant_number})
-          .attr("d", xLineGenerator(totalEmigrInYear));
-    }
-    else{
+  if(!chosen_states.includes(chosenState)){
+        chosen_states.push(chosenState)
+        id="line-"+chosenState;
+        id = id.replace(/ /g, "-");
         emigrFromState=[];
-        emigrInYear.forEach(function(d){
+        emigrInState.forEach(function(d){
             if(d.migrant_area===chosenState)
                 emigrFromState.push({ migrant_number: d.migrant_number, migrant_year: d.migrant_year })
 
         });
-
-
         d3.select("#lines")
-        //.datum(totalEmigrInYear)
         .append("path")
         .attr("class", "line")
-        //.attr('val', function(d) {return d.migrant_number})
-        .attr("d", xLineGenerator(emigrFromState));;
-
-
+        .attr('id', id)
+        .attr("d", xLineGenerator(emigrFromState))
+        .on("mouseover",function(){
+              d3.select("#country-line")
+              .text(chosenState);
+            })
+        .on("mouseout",function(){
+              d3.select("#country-line")
+              .text(null);
+            })
+        .on("click",function(){
+              chosen_states.splice(chosen_states.indexOf(chosenState), 1 )
+              d3.select(this)
+                .remove();
+            });
     }
 
 }
@@ -186,15 +209,16 @@ function createLineChart(){
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
     var yLinepad=30;
     var xLinepad=70;
+    d3.selectAll(".line").remove();
 
     var xLineScale = d3.scalePoint()
-        .domain(totalEmigrInYear.map ( function (d) {
+        .domain(emigrInState.map ( function (d) {
             return d.migrant_year;
         }))
         .range([xLinepad,svgLineBounds.width-xLinepad]);
 
     var yLineScale = d3.scaleLinear()
-        .domain([0, d3.max(totalEmigrInYear, function (d) {
+        .domain([0, d3.max(emigrInState, function (d) {
             return d.migrant_number;
         })])
         .range([svgLineBounds.height-yLinepad, yLinepad]);
@@ -205,20 +229,32 @@ function createLineChart(){
         })
         .y(function (d) {
             return (yLineScale(d.migrant_number));
-        });
+        })
 
-    var xAxis = d3.select("#xLineAxis")
+    var xLineAxis = d3.select("#xLineAxis")
         .call(d3.axisBottom()
             .scale(xLineScale))
         .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")")
         .selectAll("text")
+        .attr("cursor","pointer")
         .on("click",function(d){update_year(d);});
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
         .attr("transform", "translate (" + (xLinepad) +", 0)");
 
-    new_line(null);
-
+    d3.select("#xLineAxis").append("g")
+        .classed("grat",true)
+        .call(d3.axisBottom().scale(xLineScale)
+            .tickSize(-svgLineBounds.height+yLinepad)
+            .tickFormat(""));
+    d3.select("#yLineAxis").append("g")
+        .classed("grat",true)
+        .call(d3.axisLeft().scale(yLineScale)
+            .tickSize(-svgLineBounds.width+xLinepad)
+            .tickFormat(""));
+    states=[];
+    emigrInState.forEach(function(d){if(!states.includes(d.migrant_area)) states.push(d.migrant_area);});
+    states.forEach(function(d){new_line(d)});
            //
            // var xLineScale = d3.scaleTime()
            //     .domain([d3.min(totalEmigrInYear, function (d) {
@@ -279,39 +315,8 @@ function createPieChart(){
     .attr("text-anchor", "middle")
     .text(function(d, i) { return ageRange[i]; });
 }
-//INDICE
-// function widen(d,v) {
-//   console.log(d);
-//   console.log(v);
-  //   .selectAll(".states");
-  // states.classed("invisible", !states.classed("invisible"))
-  // d3.select(d)
-  //   .append("div")
-  //   .attr("class", "area-name")
-  //   .text(function(d) { return d;})
-  //   .attr("text-anchor", "middle")
-  // if(!expanded_continents[v]){
-  //   var stati= d3.select(d)
-  //     .selectAll(".states")
-  //     .data(paesi.filter(function (d) { return (d.Area==v);}))
-  //     .enter().append("div")
-  //     .attr("class", "states")
-  //     .text(function(d) {return d.State})
-  //     .on("click", function (d) {update_state(d.State)});
-  //   expanded_continents[v]=true;
-  //   console.log("Widening "+v+":\n");
-  //   console.log(expanded_continents);
-  // }
-  // else{
-  //   d3.select(d)
-  //     .selectAll(".states")
-  //     .remove();
-  //   expanded_continents[v]=false;
-  //   console.log("Shortening "+v+":\n");
-  //   console.log(expanded_continents);
-  //}
 
-// }
+
 function createIndex(){
     continent_array = d3.map(paesi, function(d){return d.Area}).keys()
     for(i=0;i<continent_array.length;i++)
@@ -326,143 +331,121 @@ function createIndex(){
         .each(function(d){
           d3.select(this)
             .append("div")
-            .attr("class", "area-name")
+            .classed("area-name",true)
             .text(function(d) { return d;})
             .attr("text-anchor", "middle")
             .on("click", function(d){
                 states=d3.select(this.parentNode)
-                  .selectAll(".states");
+                  .selectAll(".state-name");
                 states.classed("invisible", !states.classed("invisible"));
             });
           d3.select(this)
             .selectAll(".states")
             .data(paesi.filter(function (p) { return (p.Area==d);}))
             .enter().append("div")
-            .classed("states",true)
+            .classed("state-name",true)
             .classed("invisible",true)
             .text(function(d) {return d.State})
             .on("click", function (d) {update_state(d.State)});
           }
         )
-
-  //  continenti.text(function(d){return d})
-  //  continenti.exit().remove()
 }
 
 //SCELTA E MODIFICA PARAMETRI
 
-function chooseData(v) {
+function loadData() {
+  d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, csv) {
+      if (error) {
+          console.log(error);  //Log the error.
+  	throw error;
+      }
+      csv.forEach(function (d) {
 
-    update_state(v);
+          d.year = +d.Year;
+          d.major_area = d.MajorArea;
+          d.stato=[];
+          d.valore=[];
 
-}
+          Object.keys(d).forEach(function(key) {
+              if (d[key]!=".." && key!="MajorArea" && key!="Year" && key!="Total" && key!="total" && key!="year" && key!="major_area" && key!="stato" && key!="valore"){
+              value=(d[key]).replace(/\./g,'');
+              value = parseInt(value);
+              d.stato.push(key);
+              d.valore.push(value);
+              }
+          })
+      });
+      allMigrantStock = csv;
 
-function chooseDataLineChart(v){
 
-    var lines = d3.select("#lines");
-    var chosenEmigr=[]
-    var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
-
-    emigrInYear.forEach(function (d) {
-        if (d.migrant_area==v) chosenEmigr.push({ migrant_number: d.migrant_number, migrant_year: d.migrant_year})
-    });
-
-    lines.datum(chosenEmigr).append("path")
-       .attr("class", "line")
-       .attr('val', function(d) {return d.migrant_number})
-       .attr("d", xLineGenerator);
-}
-
-// Load CSV file on paesi
-d3.csv("data/paesi.csv", function (error, csv) {
-        if (error) {
-        console.log(error);  //Log the error.
-    throw error;
-    }
-
-    paesi = csv;
-
-});
-
-// Load CSV file on area
-d3.csv("data/MajorArea.csv", function (error, csv) {
-        if (error) {
-        console.log(error);  //Log the error.
-    throw error;
-    }
-
-    areaNotConsidered=[];
-
-    csv.forEach(function(d){
-        areaNotConsidered.push(d.MajorArea);
-    });
-});
-
-// Load CSV file on migrant age
-d3.csv("data/UN_MigrantStockByAge_2017.csv", function (error, csv) {
-        if (error) {
-        console.log(error);  //Log the error.
-    throw error;
-    }
-
-    csv.forEach(function (d) {
-
-        d.sectionOne= +(d["0-4"]);
-        d.sectionOne+= +(d["5-9"]);
-        d.sectionOne+= +(d["10-14"]);
-        d.sectionOne= (Math.round(d.sectionOne*10))/10;
-
-        d.sectionTwo= +(d["15-19"]);
-        d.sectionTwo+= +(d["20-24"]);
-        d.sectionTwo+= +(d["25-29"]);
-        d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
-
-        d.sectionThree= +(d["30-34"]);
-        d.sectionThree+= +(d["35-39"]);
-        d.sectionThree+= +(d["40-44"]);
-        d.sectionThree+= +(d["45-49"]);
-        d.sectionThree+= +(d["50-54"]);
-        d.sectionThree= (Math.round(d.sectionThree*10))/10;
-
-        d.sectionFour= +(d["55-59"]);
-        d.sectionFour+= +(d["60-64"]);
-        d.sectionFour+= +(d["65-69"]);
-        d.sectionFour+= +(d["70-74"]);
-        d.sectionFour+= +(d["75+"]);
-        d.sectionFour= (Math.round(d.sectionFour*10))/10;
-
-    })
-
-    ageMigrantStock=csv;
-
-});
-
-d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, csv) {
-    if (error) {
-        console.log(error);  //Log the error.
-	throw error;
-    }
-
-    csv.forEach(function (d) {
-
-        d.year = +d.Year;
-        d.major_area = d.MajorArea;
-        d.stato=[];
-        d.valore=[];
-
-        Object.keys(d).forEach(function(key) {
-            if (d[key]!=".." && key!="MajorArea" && key!="Year" && key!="Total" && key!="total" && key!="year" && key!="major_area" && key!="stato" && key!="valore"){
-            value=(d[key]).replace(/\./g,'');
-            value = parseInt(value);
-            d.stato.push(key);
-            d.valore.push(value);
+        // Load CSV file on paesi
+          d3.csv("data/paesi.csv", function (error, csv) {
+                if (error) {
+                console.log(error);  //Log the error.
+                throw error;
             }
-        })
+            paesi = csv;
+            console.log(paesi)
+            // Load CSV file on area
+            d3.csv("data/MajorArea.csv", function (error, csv) {
+                    if (error) {
+                    console.log(error);  //Log the error.
+                throw error;
+                }
+
+                areaNotConsidered=[];
+
+                csv.forEach(function(d){
+                    areaNotConsidered.push(d.MajorArea);
+                });
+                // Load CSV file on migrant age
+                d3.csv("data/UN_MigrantStockByAge_2017.csv", function (error, csv) {
+                        if (error) {
+                        console.log(error);  //Log the error.
+                        throw error;
+                    }
+
+                    csv.forEach(function (d) {
+
+                        d.sectionOne= +(d["0-4"]);
+                        d.sectionOne+= +(d["5-9"]);
+                        d.sectionOne+= +(d["10-14"]);
+                        d.sectionOne= (Math.round(d.sectionOne*10))/10;
+
+                        d.sectionTwo= +(d["15-19"]);
+                        d.sectionTwo+= +(d["20-24"]);
+                        d.sectionTwo+= +(d["25-29"]);
+                        d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
+
+                        d.sectionThree= +(d["30-34"]);
+                        d.sectionThree+= +(d["35-39"]);
+                        d.sectionThree+= +(d["40-44"]);
+                        d.sectionThree+= +(d["45-49"]);
+                        d.sectionThree+= +(d["50-54"]);
+                        d.sectionThree= (Math.round(d.sectionThree*10))/10;
+
+                        d.sectionFour= +(d["55-59"]);
+                        d.sectionFour+= +(d["60-64"]);
+                        d.sectionFour+= +(d["65-69"]);
+                        d.sectionFour+= +(d["70-74"]);
+                        d.sectionFour+= +(d["75+"]);
+                        d.sectionFour= (Math.round(d.sectionFour*10))/10;
+
+                    })
+
+                    ageMigrantStock=csv;
+
+                    createIndex();
+                    update_state(state)
+                });
+            });
+        });
+
+
+
+
     });
 
-    // Store csv data in a global variable
-    allMigrantStock = csv;
-    // Draw the Bar chart for the first time
-    update_state('Italy');
 
-});
+
+}

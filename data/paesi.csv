@@ -35,7 +35,6 @@ Morocco,Northern Africa
 Sudan,Northern Africa
 Tunisia,Northern Africa
 Western Sahara,Northern Africa
-Southern Africa,Northern Africa
 Botswana,Northern Africa
 Lesotho,Northern Africa
 Namibia,Northern Africa
@@ -64,8 +63,8 @@ Tajikistan,Central Asia
 Turkmenistan,Central Asia
 Uzbekistan,Central Asia
 China,Eastern Asia
-China. Hong Kong SAR,Eastern Asia
-China. Macao SAR,Eastern Asia
+China Hong Kong SAR,Eastern Asia
+China Macao SAR,Eastern Asia
 Dem. People's Republic of Korea,Eastern Asia
 Japan,Eastern Asia
 Mongolia,Eastern Asia
@@ -74,7 +73,7 @@ Afghanistan,Southern Asia
 Bangladesh,Southern Asia
 Bhutan,Southern Asia
 India,Southern Asia
-Iran (Islamic Republic of),Southern Asia
+Iran,Southern Asia
 Maldives,Southern Asia
 Nepal,Southern Asia
 Pakistan,Southern Asia
@@ -166,7 +165,7 @@ British Virgin Islands,Latin America and the Caribbean
 Caribbean Netherlands,Latin America and the Caribbean
 Cayman Islands,Latin America and the Caribbean
 Cuba,Latin America and the Caribbean
-Curaçao,Latin America and the Caribbean
+Curacao,Latin America and the Caribbean
 Dominica,Latin America and the Caribbean
 Dominican Republic,Latin America and the Caribbean
 Grenada,Latin America and the Caribbean
@@ -179,7 +178,7 @@ Puerto Rico,Latin America and the Caribbean
 Saint Kitts and Nevis,Latin America and the Caribbean
 Saint Lucia,Latin America and the Caribbean
 Saint Vincent and the Grenadines,Latin America and the Caribbean
-Sint Maarten (Dutch part),Latin America and the Caribbean
+Sint Maarten,Latin America and the Caribbean
 Trinidad and Tobago,Latin America and the Caribbean
 Turks and Caicos Islands,Latin America and the Caribbean
 Belize,Central America
@@ -191,25 +190,24 @@ Mexico,Central America
 Nicaragua,Central America
 Panama,Central America
 Argentina,South America
-Bolivia (Plurinational State of),South America
+Bolivia,South America
 Brazil,South America
 Chile,South America
 Colombia,South America
 Ecuador,South America
-Falkland Islands (Malvinas),South America
+Falkland Islands,South America
 French Guiana,South America
 Guyana,South America
 Paraguay,South America
 Peru,South America
 Suriname,South America
 Uruguay,South America
-Venezuela (Bolivarian Republic of),South America
+Venezuela,South America
 Bermuda,Northern America
 Canada,Northern America
 Greenland,Northern America
 Saint Pierre and Miquelon,Northern America
 United States of America,Northern America
-Australia/New Zealand,Oceania
 Australia,Oceania
 New Zealand,Oceania
 Melanesia,Oceania
@@ -222,7 +220,7 @@ Micronesia,Oceania
 Guam,Oceania
 Kiribati,Oceania
 Marshall Islands,Oceania
-Micronesia (Fed. States of),Oceania
+Micronesia,Oceania
 Nauru,Oceania
 Northern Mariana Islands,Oceania
 Palau,Oceania

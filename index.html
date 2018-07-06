@@ -8,29 +8,12 @@
     <script type="text/javascript" src="d3/d3.js"></script>
     <script type="text/javascript" src="d3/d3-selection-multi.js"></script>
     <script type="text/javascript" src="d3/topojson.js"></script>
-    <!--
-    <link rel="stylesheet" href="styles.css"/>
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
-    !-->
-    <style type="text/css">
 
-        .line{
-            fill:none;
-            stroke:steelblue;
-            stroke-width:1.5px;
-        }
 
-        .rectStairCase{
-            stroke-width:1;
-            stroke:black;
-        }
-
-    </style>
 
 </head>
 
-<body onload="createIndex()">
+<body onload="loadData()">
 
 <header>
     <h1>Migrant Stock</h1>
@@ -48,12 +31,15 @@
 </div>
 
 <div id="bar-chart" class="view">
-    <h2 class="">Bar Chart</h2>
-    <div id="selected-country">
+    <h2>Bar Chart</h2>
+    <span class="selected-country">
       Italy
-    </div>
+    </span>
+    <span class="selected-year">
+      2017
+    </span>
 
-    <svg width="600" height="500" id="barChart">
+    <svg width="720" height="500" id="barChart">
         <g id="xAxis" class="axis"></g>
         <g id="yAxis" class="axis"></g>
         <g id="bars"></g>
@@ -62,7 +48,12 @@
 
 <div id="line-chart" class="view">
     <h2 class="">Line Chart</h2>
-    <svg width="500" height="300" id="lineChart">
+    <span class="selected-country">
+      Italy
+    </span>
+    <span id="country-line">
+    </span>
+    <svg width="720" height="500" id="lineChart">
         <g id="xLineAxis" class="axis"></g>
         <g id="yLineAxis" class="axis"></g>
         <g id="lines"></g>
