@@ -5,13 +5,14 @@ var areaNotConsidered;
 var state="Italy";
 var emigrInState=[];
 var inputData=[];
-var years = ["1990", "1995", "2000", "2005", "2010", "2015", "2017"]
+var years = ["1990", "1995", "2000", "2005", "2010", "2015", "2017"];
+var chosen_states=[];
 
 function select_state(){
    migrantForeachState.forEach(function(d){
     if (d.MajorArea==state){
       for(i=0; i<7; i++)
-      inputData.push({migrant_year: years[i] , migrant_percentage: d[years[i]] })
+      inputData.push({migrant_year: +years[i] , migrant_percentage: +d[years[i]] })
     }
    })
 }
@@ -69,7 +70,7 @@ function drawMap(world) {
           codeName.forEach(function (f){
             if (d.id == f.CountryCode) {
               state=f.CountryName; 
-              select_state()
+              select_state();
               return new_line();}
           })
         });
@@ -95,55 +96,51 @@ function drawMap(world) {
 
 //---LINE Chart
 
-function new_line(chosenState){
-  if(!chosen_states.includes(chosenState)){
-        chosen_states.push(chosenState)
-        emigrFromState=[];
-        emigrInState.forEach(function(d){
-            if(d.migrant_area===chosenState)
-                emigrFromState.push({ migrant_number: d.migrant_number, migrant_year: d.migrant_year })
+function new_line(){
+  if(!chosen_states.includes(inputData.MajorArea)){
+        chosen_states.push(inputData.MajorArea)
 
-        });
         d3.select("#lines")
         .append("path")
         .attr("class", "line")
-        .attr('id', newId(chosenState,"line"))
-        .attr("d", xLineGenerator(emigrFromState))
+        .attr('id', newId(inputData.MajorArea,"line"))
+        .attr("d", xLineGenerator(inputData))
         .on("mouseover",function(){
               d3.select("#country-line")
-              .text(chosenState);
+              .text(inputData.MajorArea);
             })
         .on("mouseout",function(){
               d3.select("#country-line")
               .text(null);
             })
         .on("click",function(){
-              chosen_states.splice(chosen_states.indexOf(chosenState), 1 )
+              chosen_states.splice(chosen_states.indexOf(inputData.MajorArea), 1 )
               d3.select(this)
                 .remove();
             });
     }
 
 }
+
 function createLineChart(){
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
     var yLinepad=30;
     var xLinepad_right=60;
     var xLinepad_left=20;
     d3.selectAll(".line").remove();
+    console.log(inputData);
 
     var xLineScale = d3.scalePoint()
         .domain(years)
         .range([xLinepad_right,svgLineBounds.width-xLinepad_left]);
 
     var yLineScale = d3.scaleLinear()
-        .domain([0, d3.max(inputData, function (d) {
-          d.migrant_percentage;
-        })])
+        .domain([0, (d3.max(d3.values(inputData))).migrant_percentage])
         .range([svgLineBounds.height-yLinepad, yLinepad]);
 
     xLineGenerator = d3.line()
         .x(function (d) {
+            console.log("1 "+ xLineScale(d.migrant_year));
             return (xLineScale(d.migrant_year));
         })
         .y(function (d) {
@@ -196,9 +193,9 @@ function loadDataMap(){
         else {
           loadMap();
           migrantForeachState=file1;
-          console.log(migrantForeachState);
           areaNotConsidered=file2
           codeName=file3;
+          select_state();
           createLineChart();
         }
 
