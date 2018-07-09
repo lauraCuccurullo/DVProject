@@ -3,6 +3,11 @@ var codeName;
 var selectedYear="1995";
 var areaNotConsidered;
 
+
+
+
+
+
 function drawMap(world) {
 
     migrantForeachState.forEach(function (d){
@@ -27,7 +32,7 @@ console.log([d3.min(migrantForeachState, function (d) {
         .interpolate(d3.interpolateHcl)
         .range([d3.rgb('#0aaaff'),d3.rgb("#000040")]);
 
-    projection = d3.geoEquirectangular().scale(150).translate([400, 350]);
+    projection = d3.geoEquirectangular();
 
     var map = d3.select("#map").data(migrantForeachState),
     path = d3.geoPath().projection(projection),
@@ -53,78 +58,53 @@ console.log([d3.min(migrantForeachState, function (d) {
         .on("mouseout", function(){
                 d3.select(this).style('fill', setColor)})
         .on("click", function(d){
-            
+
         });
+    function setColor(d){
 
-function setColor(d){  
-            
-            var nameCountry;
-            var result;
+        var nameCountry;
+        var result;
 
-            codeName.forEach(function (f){
-                if (f.CountryCode==d.id) nameCountry=f.CountryName;
-            })
+        codeName.forEach(function (f){
+            if (f.CountryCode==d.id) nameCountry=f.CountryName;
+        })
 
-            migrantForeachState.forEach(function (f){
-                if (f.MajorArea==nameCountry) result=f[selectedYear];
-            })
+        migrantForeachState.forEach(function (f){
+            if (f.MajorArea==nameCountry) result=f[selectedYear];
+        })
 
-            console.log(nameCountry +"  -  "+ result+"  -  "+ colorScale(result));
+        console.log(nameCountry +"  -  "+ result+"  -  "+ colorScale(result));
 
-            return colorScale(result);
-        }
-
+        return colorScale(result);
+    }
 }
 
-d3.json("data/world.json", function (error, world) {
-    if (error) { 
-        console.log(error);  //Log the error.
-    throw error;
-    }
+function loadMap(){
+  d3.json("data/world.json", function (error, world) {
+      if (error) {
+          console.log(error);
+          throw error;
+      }
+      drawMap(world);
+  });
+}
 
-    drawMap(world);
-});
+function loadDataMap(){
+  var q = d3.queue();
+      q.defer(d3.csv,"data/UN_MigrantStockTotal_2017.csv");
+      q.defer(d3.csv,"data/MajorArea.csv");
+      q.defer(d3.csv,"data/CountryCodeName.csv");
+      q.await(function(error,file1,file2,file3) {
+        if (error){
+            console.log(error);
+            throw error;
+        }
+        else {
+          loadMap();
+          migrantForeachState=file1;
+          areaNotConsidered=file2
+          codeName=file3;
+        }
 
-// Load CSV file
-d3.csv("data/UN_MigrantStockTotal_2017.csv", function (error, csv) {
-    if (error) { 
-        console.log(error);  //Log the error.
-    throw error;
-    }
-
-    csv.forEach(function (d) {
-
-    });
-
-    // Store csv data in a global variable
-    migrantForeachState = csv;
-});
-
-//Load
-d3.csv("data/CountryCodeName.csv", function (error, csv) {
-    if (error) { 
-        console.log(error);  //Log the error.
-    throw error;
-    }
-
-    csv.forEach(function (d) {
-
-    });
-
-    // Store csv data in a global variable
-    codeName = csv;
-});
-
-// Load CSV file on area
-d3.csv("data/MajorArea.csv", function (error, csv) {
-        if (error) {
-        console.log(error);  //Log the error.
-    throw error;
-    }
-
-    areaNotConsidered=[];
-
-    csv.forEach(function(d){
-        areaNotConsidered.push(d.MajorArea);
-    });
-});
+      });
+  }

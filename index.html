@@ -8,12 +8,14 @@
     <script type="text/javascript" src="d3/d3.js"></script>
     <script type="text/javascript" src="d3/d3-selection-multi.js"></script>
     <script type="text/javascript" src="d3/topojson.js"></script>
+    <script type="application/javascript" src="script.js?version=1"></script>
+    <script type="application/javascript" src="script2.js?version=1"></script>
 
 
 
 </head>
 
-<body onload="loadData()">
+<body onload="loadData(); loadDataMap();">
 
 <!-- <header>
     <h1>Migrant Stock</h1>
@@ -29,8 +31,11 @@
     <svg width="200" height="200">
     </svg>
 </div> -->
-
-<span id="bar-chart" class="view">
+<span id="map-container" class="view" onclick="show_charts()">
+    <svg id="map" width="100%" height="100%">
+    </svg>
+</span>
+<span id="bar-chart" class="view invisible">
     <span class="selected-country">
       Italy
     </span>
@@ -38,19 +43,19 @@
       2017
     </span>
 
-    <svg width="600" height="420" id="barChart">
+    <svg width="100%" height="90%" id="barChart">
         <g id="yBarAxis" class="axis"></g>
         <g id="bars"></g>
     </svg>
 </span>
 
-<span id="line-chart" class="view">
+<span id="line-chart" class="view invisible">
     <span class="selected-country">
       Italy
     </span>
     <span id="country-line">
     </span>
-    <svg width="600" height="420" id="lineChart">
+    <svg width="100%" height="90%" id="lineChart">
         <g id="xLineAxis" class="axis"></g>
         <g id="yLineAxis" class="axis"></g>
         <g id="lines"></g>
@@ -58,18 +63,17 @@
 </span>
 
 
-<div id="pie-chart" class="view">
+<!-- <div id="pie-chart" class="view">
     <div id="plot-selector-pie">
     </div>
 
     <svg width="300" height="300" id="pieChart">
         <g id="pie"></g>
     </svg>
-</div>
+</div> -->
 
 
 
-<script type="application/javascript" src="script.js?version=1"></script>
 
 </body>
 </html>

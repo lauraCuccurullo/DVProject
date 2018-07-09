@@ -1,5 +1,5 @@
 var allMigrantStock;
-var areaNotConsidered;
+var areaNotConsidered=[];
 var media;
 var totalEmigrInYear = [];
 var emigrInState = [];
@@ -11,8 +11,14 @@ var expanded_continents=[];
 var year="2017"
 var state="Italy"
 var chosen_states=[]
+var threshold;
 
-
+function show_charts(){
+    d3.select("#bar-chart").classed("invisible",false);
+    d3.select("#line-chart").classed("invisible",false);
+    d3.select("#map-container").classed("hide",true);
+    update_state(state);
+}
 function update_year(y){
   year=y;
   d3.selectAll(".selected-year")
@@ -23,7 +29,7 @@ function update_year(y){
           emigrInYear.push({ migrant_number: d.migrant_number, migrant_area: d.migrant_area })
   });
   createBarChart();
-  createPieChart();
+  //createPieChart();
 }
 
 function update_state(s){
@@ -50,7 +56,7 @@ function update_state(s){
                 d[s] = parseInt((d[s]).replace(/\./g,''));
             }
 
-            if (!(areaNotConsidered.includes(d.major_area)) && d.major_area!="") {
+            if (!(areaNotConsidered.includes(d.MajorArea)) && d.MajorArea!="") {
                 somma+=d[s];
                 if (d[s]!=0) count+=1;
             }
@@ -62,31 +68,31 @@ function update_state(s){
 
         allMigrantStock.forEach(function (d) {
 
-            if(d[s]>=(media) && !(statesInMedia.includes(d.major_area)) && !(areaNotConsidered.includes(d.major_area)))
-                statesInMedia.push(d.major_area);
+            if(d[s]>=(media) && !(statesInMedia.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea)))
+                statesInMedia.push(d.MajorArea);
         });
 
         allMigrantStock.forEach(function (d) {
 
-            if(d.major_area=="WORLD"){
-                totalEmigrInYear.push({ migrant_number: d[s], migrant_year: d.year})
+            if(d.MajorArea=="WORLD"){
+                totalEmigrInYear.push({ migrant_number: d[s], migrant_year: d.Year})
             }
 
-            if(statesInMedia.includes(d.major_area)){
+            if(statesInMedia.includes(d.MajorArea)){
 
-                emigrInState.push({migrant_number: d[s], migrant_area: d.major_area, migrant_year: d.year});
+                emigrInState.push({migrant_number: d[s], migrant_area: d.MajorArea, migrant_year: d.Year});
 
             }
         });
-    ageMigrantStock.forEach(function(d){
-
-        if(d.MajorArea==s && d.Year==year){
-            agePercentage.push(d.sectionOne)
-            agePercentage.push(d.sectionTwo)
-            agePercentage.push(d.sectionThree)
-            agePercentage.push(d.sectionFour)
-        }
-    })
+    // ageMigrantStock.forEach(function(d){
+    //
+    //     if(d.MajorArea==s && d.Year==year){
+    //         agePercentage.push(d.sectionOne)
+    //         agePercentage.push(d.sectionTwo)
+    //         agePercentage.push(d.sectionThree)
+    //         agePercentage.push(d.sectionFour)
+    //     }
+    // })
   chosen_states=[];
   update_year(year)
   createLineChart();
@@ -97,7 +103,7 @@ function update_state(s){
 function update_charts(){
   createBarChart();
   createLineChart();
-  createPieChart();
+  //createPieChart();
 }
 function getId(d,chart){
     id="#"+chart+"-"+d;
@@ -109,7 +115,7 @@ function newId(d,chart){
 function createBarChart(){
     var svgBarBounds = d3.select("#barChart").node().getBoundingClientRect();
     var xBarpad = 100;
-    var yBarpad = 40;
+    var yBarpad = 30;
     var yScale = d3.scaleBand()
         .domain(emigrInYear.map(function(d) {
             return d.migrant_area;
@@ -126,11 +132,6 @@ function createBarChart(){
     var yBarAxis = d3.select("#yBarAxis").call(d3.axisLeft().scale(yScale).tickSizeOuter(0))
         .attr("transform", "translate (" + (xBarpad) +", 0)")
         .selectAll("text")
-        .on("click",function(d){
-              new_line(d);
-              d3.select(getId(d,"line"))
-                .classed("highlight",false);
-            })
         .attr("transform", "rotate (30)")
 
     var colorScale= d3.scaleLinear()
@@ -213,14 +214,15 @@ function new_line(chosenState){
 function createLineChart(){
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
     var yLinepad=30;
-    var xLinepad=70;
+    var xLinepad_right=60;
+    var xLinepad_left=20;
     d3.selectAll(".line").remove();
 
     var xLineScale = d3.scalePoint()
         .domain(emigrInState.map ( function (d) {
             return d.migrant_year;
         }))
-        .range([xLinepad,svgLineBounds.width-xLinepad]);
+        .range([xLinepad_right,svgLineBounds.width-xLinepad_left]);
 
     var yLineScale = d3.scaleLinear()
         .domain([0, d3.max(emigrInState, function (d) {
@@ -245,17 +247,17 @@ function createLineChart(){
         .on("click",function(d){update_year(d);});
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
-        .attr("transform", "translate (" + (xLinepad) +", 0)");
+        .attr("transform", "translate (" + (xLinepad_right) +", 0)");
 
     d3.select("#xLineAxis").append("g")
         .classed("grat",true)
         .call(d3.axisBottom().scale(xLineScale)
-            .tickSize(-svgLineBounds.height+yLinepad)
+            .tickSize(-svgLineBounds.height+2*yLinepad)
             .tickFormat(""));
     d3.select("#yLineAxis").append("g")
         .classed("grat",true)
         .call(d3.axisLeft().scale(yLineScale)
-            .tickSize(-svgLineBounds.width+xLinepad)
+            .tickSize(-svgLineBounds.width+xLinepad_right)
             .tickFormat(""));
     states=[];
     emigrInState.forEach(function(d){if(!states.includes(d.migrant_area)) states.push(d.migrant_area);});
@@ -331,15 +333,20 @@ function createIndex(){
         .data(continent_array);
 
     continenti.enter()
-        .append("span")
-        .attr("class", "areas")
+        .append("div")
+        .classed("areas",true)
         .each(function(d){
           d3.select(this)
-            .append("span")
+            .attr("id","index-"+d)
+            .append("div")
             .classed("area-name",true)
             .text(function(d) { return d;})
             .attr("text-anchor", "middle")
-            .on("click", function(d){
+            .on("click", function(){
+                d3.select("#index").selectAll(".areas")
+                  .filter(function(d){ if(d!==this.parentNode) return d;})
+                  .selectAll(".state-name")
+                  .classed("invisible",true);
                 states=d3.select(this.parentNode)
                   .selectAll(".state-name");
                 states.classed("invisible", !states.classed("invisible"));
@@ -347,7 +354,7 @@ function createIndex(){
           d3.select(this)
             .selectAll(".states")
             .data(paesi.filter(function (p) { return (p.Area==d);}))
-            .enter().append("span")
+            .enter().append("div")
             .classed("state-name",true)
             .classed("invisible",true)
             .text(function(d) {return d.State})
@@ -357,100 +364,64 @@ function createIndex(){
 }
 
 //SCELTA E MODIFICA PARAMETRI
-
-function loadData() {
-  d3.csv("data/UN_MigrantStockByOriginAndDestination_2017.csv", function (error, csv) {
-      if (error) {
-          console.log(error);  //Log the error.
-  	throw error;
-      }
-      csv.forEach(function (d) {
-
-          d.year = +d.Year;
-          d.major_area = d.MajorArea;
-          d.stato=[];
-          d.valore=[];
-
-          Object.keys(d).forEach(function(key) {
-              if (d[key]!=".." && key!="MajorArea" && key!="Year" && key!="Total" && key!="total" && key!="year" && key!="major_area" && key!="stato" && key!="valore"){
-              value=(d[key]).replace(/\./g,'');
-              value = parseInt(value);
-              d.stato.push(key);
-              d.valore.push(value);
-              }
+function loadData(){
+  var q = d3.queue();
+      q.defer(d3.csv,"data/UN_MigrantStockByOriginAndDestination_2017.csv");
+      q.defer(d3.csv,"data/MajorArea.csv");
+      q.defer(d3.csv,"data/paesi.csv");
+      q.await(function(error,file1,file2,file3) {
+        if (error){
+            console.log(error);
+            throw error;
+        }
+        else {
+          allMigrantStock=file1;
+          file2.forEach(function(d){
+            areaNotConsidered.push(d.MajorArea)
           })
+          paesi=file3;
+          createIndex();
+          update_state(state)
+        }
+
       });
-      allMigrantStock = csv;
-
-
-        // Load CSV file on paesi
-          d3.csv("data/paesi.csv", function (error, csv) {
-                if (error) {
-                console.log(error);  //Log the error.
-                throw error;
-            }
-            paesi = csv;
-            console.log(paesi)
-            // Load CSV file on area
-            d3.csv("data/MajorArea.csv", function (error, csv) {
-                    if (error) {
-                    console.log(error);  //Log the error.
-                throw error;
-                }
-
-                areaNotConsidered=[];
-
-                csv.forEach(function(d){
-                    areaNotConsidered.push(d.MajorArea);
-                });
-                // Load CSV file on migrant age
-                d3.csv("data/UN_MigrantStockByAge_2017.csv", function (error, csv) {
-                        if (error) {
-                        console.log(error);  //Log the error.
-                        throw error;
-                    }
-
-                    csv.forEach(function (d) {
-
-                        d.sectionOne= +(d["0-4"]);
-                        d.sectionOne+= +(d["5-9"]);
-                        d.sectionOne+= +(d["10-14"]);
-                        d.sectionOne= (Math.round(d.sectionOne*10))/10;
-
-                        d.sectionTwo= +(d["15-19"]);
-                        d.sectionTwo+= +(d["20-24"]);
-                        d.sectionTwo+= +(d["25-29"]);
-                        d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
-
-                        d.sectionThree= +(d["30-34"]);
-                        d.sectionThree+= +(d["35-39"]);
-                        d.sectionThree+= +(d["40-44"]);
-                        d.sectionThree+= +(d["45-49"]);
-                        d.sectionThree+= +(d["50-54"]);
-                        d.sectionThree= (Math.round(d.sectionThree*10))/10;
-
-                        d.sectionFour= +(d["55-59"]);
-                        d.sectionFour+= +(d["60-64"]);
-                        d.sectionFour+= +(d["65-69"]);
-                        d.sectionFour+= +(d["70-74"]);
-                        d.sectionFour+= +(d["75+"]);
-                        d.sectionFour= (Math.round(d.sectionFour*10))/10;
-
-                    })
-
-                    ageMigrantStock=csv;
-
-                    createIndex();
-                    update_state(state)
-                });
-            });
-        });
+  }
 
 
 
 
-    });
 
-
-
-}
+// Load CSV file on migrant age
+// d3.csv("data/UN_MigrantStockByAge_2017.csv", function (error, csv) {
+//         if (error) {
+//         console.log(error);  //Log the error.
+//         throw error;
+//     }
+//
+//     csv.forEach(function (d) {
+//
+//         d.sectionOne= +(d["0-4"]);
+//         d.sectionOne+= +(d["5-9"]);
+//         d.sectionOne+= +(d["10-14"]);
+//         d.sectionOne= (Math.round(d.sectionOne*10))/10;
+//
+//         d.sectionTwo= +(d["15-19"]);
+//         d.sectionTwo+= +(d["20-24"]);
+//         d.sectionTwo+= +(d["25-29"]);
+//         d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
+//
+//         d.sectionThree= +(d["30-34"]);
+//         d.sectionThree+= +(d["35-39"]);
+//         d.sectionThree+= +(d["40-44"]);
+//         d.sectionThree+= +(d["45-49"]);
+//         d.sectionThree+= +(d["50-54"]);
+//         d.sectionThree= (Math.round(d.sectionThree*10))/10;
+//
+//         d.sectionFour= +(d["55-59"]);
+//         d.sectionFour+= +(d["60-64"]);
+//         d.sectionFour+= +(d["65-69"]);
+//         d.sectionFour+= +(d["70-74"]);
+//         d.sectionFour+= +(d["75+"]);
+//         d.sectionFour= (Math.round(d.sectionFour*10))/10;
+//
+//     })
