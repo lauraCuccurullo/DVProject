@@ -54,7 +54,9 @@ function drawMap(world) {
         .on("mouseout", function(){
                 d3.select(this).style('fill', "grey")})
         .on("click", function(d){
-
+                codeName.forEach(function (f){
+                  if (d.id == f.CountryCode) {state=f.CountryName; return show_charts();}
+                })
         });
 
 }
@@ -409,7 +411,8 @@ function loadData(){
       q.defer(d3.csv,"data/paesi.csv");
       q.defer(d3.json,"data/world.json")
       q.defer(d3.csv,"data/DEstinatioOrigin-1.csv");
-      q.await(function(error,file1,file2,file3,file4, file5) {
+      q.defer(d3.csv,"data/CountryCodeName.csv")
+      q.await(function(error,file1,file2,file3,file4, file5, file6) {
         if (error){
             console.log(error);
             throw error;
@@ -422,6 +425,7 @@ function loadData(){
             areaNotConsidered.push(d.MajorArea)
           })
           paesi=file3;
+          codeName=file6;
           createIndex();
           drawMap(file4);
         }
