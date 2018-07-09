@@ -11,16 +11,19 @@ var expanded_continents=[];
 var year="2017"
 var state="Italy"
 var chosen_states=[]
-var threshold;
+var threshold=1000;
+var emigrates;
+var immigrates;
 
 function changeInput(){
-    console.log(document.getElementById("immigration").checked);
     if(document.getElementById("immigration").checked){
-          allMigrantStock=allMigrantStock;
+          allMigrantStock=immigrates;
     }
     else{
-      allMigrantStock=allMigrantStock;
+      allMigrantStock=emigrates;
     }
+
+    show_charts();
 }
 
 
@@ -63,13 +66,15 @@ function hide_charts(){
 }
 
 function show_charts(){
+    update_state();
+    update_year();
     d3.select("#bar-chart").classed("invisible",false);
     d3.select("#line-chart").classed("invisible",false);
     d3.select("#map-container").classed("hide",true);
-    update_state(state);
+    createBarChart();
+    createLineChart();
 }
-function update_year(y){
-  year=y;
+function update_year(){
   d3.selectAll(".selected-year")
       .text(year);
   emigrInYear=[];
@@ -77,12 +82,9 @@ function update_year(y){
       if(d.migrant_year==year)
           emigrInYear.push({ migrant_number: d.migrant_number, migrant_area: d.migrant_area })
   });
-  createBarChart();
-  //createPieChart();
 }
 
-function update_state(s){
-    state=s;
+function update_state(){
     d3.selectAll(".selected-country")
         .text(state);
     d3.select("#country-line")
@@ -96,41 +98,37 @@ function update_state(s){
     media=0
     ageRange =["0-14", "15-29", "30-54", "55+"];
 
-
-        console.log("reading");
-        console.log(areaNotConsidered);
         allMigrantStock.forEach(function (d){
 
-            if (typeof(d[s])!='number'){
-                if (d[s]=="..") d[s]="0";
-                d[s] = parseInt((d[s]).replace(/\./g,''));
-            }
+            d[state] = +d[state];
 
-            if (!(areaNotConsidered.includes(d.MajorArea)) && d.MajorArea!="") {
-                somma+=d[s];
-                if (d[s]!=0) count+=1;
+            if (!(areaNotConsidered.includes(d.MajorArea)) && d.MajorArea!="" && d[state]>threshold) {
+                somma+=d[state];
+                if (d[state]!=0) count+=1;
             }
 
         });
 
         media=somma/count;
+
         var statesInMedia=[];
 
         allMigrantStock.forEach(function (d) {
 
-            if(d[s]>=(media) && !(statesInMedia.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea)))
+            if(d[state]>=(media) && !(statesInMedia.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea))){
                 statesInMedia.push(d.MajorArea);
+              }
         });
 
         allMigrantStock.forEach(function (d) {
 
             if(d.MajorArea=="WORLD"){
-                totalEmigrInYear.push({ migrant_number: d[s], migrant_year: d.Year})
+                totalEmigrInYear.push({ migrant_number: d[state], migrant_year: d.Year})
             }
 
             if(statesInMedia.includes(d.MajorArea)){
 
-                emigrInState.push({migrant_number: d[s], migrant_area: d.MajorArea, migrant_year: d.Year});
+                emigrInState.push({migrant_number: d[state], migrant_area: d.MajorArea, migrant_year: d.Year});
 
             }
         });
@@ -144,17 +142,8 @@ function update_state(s){
     //     }
     // })
   chosen_states=[];
-  update_year(year)
-  createLineChart();
-
   }
 
-    //---BAR CHART
-function update_charts(){
-  createBarChart();
-  createLineChart();
-  //createPieChart();
-}
 function getId(d,chart){
     id="#"+chart+"-"+d;
     return(id.replace(/ /g, "-"));
@@ -190,7 +179,6 @@ function createBarChart(){
         })])
         .interpolate(d3.interpolateHcl)
         .range([d3.rgb('#FFFFC2'),d3.rgb("#BF4100")]);
-
 
     var bars = d3.select("#bars")
         .selectAll("rect")
@@ -294,7 +282,7 @@ function createLineChart(){
         .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")")
         .selectAll("text")
         .attr("cursor","pointer")
-        .on("click",function(d){update_year(d);});
+        .on("click",function(d){year=d; show_charts();});
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
         .attr("transform", "translate (" + (xLinepad_right) +", 0)");
@@ -408,7 +396,7 @@ function createIndex(){
             .classed("state-name",true)
             .classed("invisible",true)
             .text(function(d) {return d.State})
-            .on("click", function (d) {update_state(d.State)});
+            .on("click", function (d) {state=d.State; show_charts();});
           }
         )
 }
@@ -420,21 +408,22 @@ function loadData(){
       q.defer(d3.csv,"data/MajorArea.csv");
       q.defer(d3.csv,"data/paesi.csv");
       q.defer(d3.json,"data/world.json")
-      q.await(function(error,file1,file2,file3,file4) {
+      q.defer(d3.csv,"data/DEstinatioOrigin-1.csv");
+      q.await(function(error,file1,file2,file3,file4, file5) {
         if (error){
             console.log(error);
             throw error;
         }
         else {
+          emigrates=file1;
+          immigrates=file5;
           allMigrantStock=file1;
           file2.forEach(function(d){
             areaNotConsidered.push(d.MajorArea)
           })
           paesi=file3;
-          console.log(areaNotConsidered);
           createIndex();
           drawMap(file4);
-          update_state(state)
         }
 
       });
