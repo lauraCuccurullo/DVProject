@@ -17,11 +17,11 @@ function drawMap(world) {
         }
     });
 
-console.log([d3.min(migrantForeachState, function (d) {
-                return d[selectedYear];
-            }), d3.max(migrantForeachState, function (d) {
-                if (!(areaNotConsidered.includes(d.MajorArea))) return d[selectedYear];
-        })])
+// console.log([d3.min(migrantForeachState, function (d) {
+//                 return d[selectedYear];
+//             }), d3.max(migrantForeachState, function (d) {
+//                 if (!(areaNotConsidered.includes(d.MajorArea))) return d[selectedYear];
+//         })])
 
     var colorScale= d3.scaleLinear()
         .domain([d3.min(migrantForeachState, function (d) {
@@ -73,7 +73,7 @@ console.log([d3.min(migrantForeachState, function (d) {
             if (f.MajorArea==nameCountry) result=f[selectedYear];
         })
 
-        console.log(nameCountry +"  -  "+ result+"  -  "+ colorScale(result));
+        // console.log(nameCountry +"  -  "+ result+"  -  "+ colorScale(result));
 
         return colorScale(result);
     }

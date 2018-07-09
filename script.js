@@ -13,6 +13,55 @@ var state="Italy"
 var chosen_states=[]
 var threshold;
 
+function changeInput(){
+    console.log(document.getElementById("immigration").checked);
+    if(document.getElementById("immigration").checked){
+          allMigrantStock=allMigrantStock;
+    }
+    else{
+      allMigrantStock=allMigrantStock;
+    }
+}
+
+
+function drawMap(world) {
+    projection = d3.geoEquirectangular();
+
+    var map = d3.select("#map"),
+    path = d3.geoPath().projection(projection),
+    g = map.append("g");
+
+    g.append("path")
+        .attr("id", "graticule")
+        .attr("class", "grat")
+        .attr("fill", "none")
+        .attr("d", path(d3.geoGraticule10()));
+
+    var countries = topojson.feature(world, world.objects.countries).features
+
+    g.selectAll("path")
+        .data(countries)
+        .enter().insert("path", ".graticule")
+        .attr("class", 'countries')
+        .attr("id", function(d){return d.id})
+        .attr("d", path)
+        .style('fill', "grey")
+        .on("mouseover", function(d,i){
+                d3.select(this).style("fill", "#ffa07a")})
+        .on("mouseout", function(){
+                d3.select(this).style('fill', "grey")})
+        .on("click", function(d){
+
+        });
+
+}
+
+function hide_charts(){
+    d3.select("#bar-chart").classed("invisible",true);
+    d3.select("#line-chart").classed("invisible",true);
+    d3.select("#map-container").classed("hide",false);
+}
+
 function show_charts(){
     d3.select("#bar-chart").classed("invisible",false);
     d3.select("#line-chart").classed("invisible",false);
@@ -48,7 +97,8 @@ function update_state(s){
     ageRange =["0-14", "15-29", "30-54", "55+"];
 
 
-
+        console.log("reading");
+        console.log(areaNotConsidered);
         allMigrantStock.forEach(function (d){
 
             if (typeof(d[s])!='number'){
@@ -369,7 +419,8 @@ function loadData(){
       q.defer(d3.csv,"data/UN_MigrantStockByOriginAndDestination_2017.csv");
       q.defer(d3.csv,"data/MajorArea.csv");
       q.defer(d3.csv,"data/paesi.csv");
-      q.await(function(error,file1,file2,file3) {
+      q.defer(d3.json,"data/world.json")
+      q.await(function(error,file1,file2,file3,file4) {
         if (error){
             console.log(error);
             throw error;
@@ -380,7 +431,9 @@ function loadData(){
             areaNotConsidered.push(d.MajorArea)
           })
           paesi=file3;
+          console.log(areaNotConsidered);
           createIndex();
+          drawMap(file4);
           update_state(state)
         }
 
