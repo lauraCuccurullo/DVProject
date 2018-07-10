@@ -9,6 +9,8 @@ var years = ["1990", "1995", "2000", "2005", "2010", "2015", "2017"];
 var chosen_states=[];
 var yLineScale;
 var xLineGenerator;
+var paesi;
+var expanded_continents=[];
 
 function getId(d){
     id="#line-"+d;
@@ -189,6 +191,52 @@ function createLineChart(state){
             });
 }
 
+
+function createIndex(){
+    continent_array = d3.map(paesi, function(d){return d.Area}).keys()
+    for(i=0;i<continent_array.length;i++)
+        expanded_continents[continent_array[i]]=false;
+    var continenti = d3.select("#index2")
+        .selectAll(".areas2")
+        .data(continent_array);
+
+    continenti.enter()
+        .append("span")
+        .classed("areas2",true)
+        .each(function(d){
+          d3.select(this)
+            .attr("id","index-"+d)
+            .append("span")
+            .classed("area-name2",true)
+            .text(function(d) { return d;})
+            .attr("text-anchor", "middle")
+            .on("click", function(){
+                d3.select("#index2").selectAll(".areas2")
+                  .filter(function(d){ if(d!==this.parentNode) return d;})
+                  .selectAll(".state-name2")
+                  .classed("invisible",true);
+                states=d3.select(this.parentNode)
+                  .selectAll(".state-name2");
+                states.classed("invisible", !states.classed("invisible"));
+            });
+          d3.select(this)
+            .selectAll(".states2")
+            .data(paesi.filter(function (p) { return (p.Area==d);}))
+            .enter().append("div")
+            .classed("state-name2",true)
+            .classed("invisible",true)
+            .text(function(d) {return d.State})
+            .on("click", function (d) {state=d.State; show_charts();});
+          }
+        )
+}
+
+
+
+
+
+
+
 function loadMap(){
   d3.json("data/world.json", function (error, world) {
       if (error) {
@@ -204,7 +252,8 @@ function loadDataMap(){
       q.defer(d3.csv,"data/UN_MigrantStockTotal_2017.csv");
       q.defer(d3.csv,"data/MajorArea.csv");
       q.defer(d3.csv,"data/CountryCodeName.csv");
-      q.await(function(error,file1,file2,file3) {
+      q.defer(d3.csv,"data/paesi.csv");
+      q.await(function(error,file1,file2,file3, file4) {
         if (error){
             console.log(error);
             throw error;
@@ -214,6 +263,8 @@ function loadDataMap(){
           migrantForeachState=file1;
           areaNotConsidered=file2
           codeName=file3;
+          paesi=file4;
+          createIndex();
 //          select_state("Italy");
 //          createLineChart();
         }
