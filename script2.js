@@ -2,35 +2,35 @@ var migrantForeachState;
 var codeName;
 var selectedYear="1995";
 var areaNotConsidered;
-var state="Italy";
 var emigrInState=[];
-var inputData=[];
+var lastSelectedData=[];
+var allSelectedData=[];
 var years = ["1990", "1995", "2000", "2005", "2010", "2015", "2017"];
 var chosen_states=[];
+var yLineScale;
+var xLineGenerator;
 
-function select_state(){
+function getId(d){
+    id="#line-"+d;
+    return(id.replace(/ /g, "-"));
+}
+function newId(d){
+    return(getId(d).replace(/#/g, ""));
+}
+
+
+function select_state(state){
    migrantForeachState.forEach(function(d){
     if (d.MajorArea==state){
-      for(i=0; i<7; i++)
-      inputData.push({migrant_year: +years[i] , migrant_percentage: +d[years[i]] })
+      for(i=0; i<7; i++){
+      lastSelectedData.push({migrant_year: +years[i] , migrant_percentage: +d[years[i]] });
+      allSelectedData.push({migrant_Area: state, migrant_year: +years[i] , migrant_percentage: +d[years[i]] });
+      }
     }
    })
 }
 
 function drawMap(world) {
-
-    migrantForeachState.forEach(function (d){
-
-        if (typeof(d[selectedYear])!='number'){
-            d[selectedYear] = d[selectedYear];
-        }
-    });
-
-// console.log([d3.min(migrantForeachState, function (d) {
-//                 return d[selectedYear];
-//             }), d3.max(migrantForeachState, function (d) {
-//                 if (!(areaNotConsidered.includes(d.MajorArea))) return d[selectedYear];
-//         })])
 
     var colorScale= d3.scaleLinear()
         .domain([d3.min(migrantForeachState, function (d) {
@@ -69,9 +69,9 @@ function drawMap(world) {
         .on("click", function(d){
           codeName.forEach(function (f){
             if (d.id == f.CountryCode) {
-              state=f.CountryName; 
-              select_state();
-              return new_line();}
+              lastSelectedData=[];
+              select_state(f.CountryName);
+              return new_line(f.CountryName);}
           })
         });
 
@@ -88,64 +88,43 @@ function drawMap(world) {
             if (f.MajorArea==nameCountry) result=f[selectedYear];
         })
 
-        // console.log(nameCountry +"  -  "+ result+"  -  "+ colorScale(result));
-
         return colorScale(result);
     }
 }
 
 //---LINE Chart
 
-function new_line(){
-  if(!chosen_states.includes(inputData.MajorArea)){
-        chosen_states.push(inputData.MajorArea)
+function new_line(state){
 
-        d3.select("#lines")
-        .append("path")
-        .attr("class", "line")
-        .attr('id', newId(inputData.MajorArea,"line"))
-        .attr("d", xLineGenerator(inputData))
-        .on("mouseover",function(){
-              d3.select("#country-line")
-              .text(inputData.MajorArea);
-            })
-        .on("mouseout",function(){
-              d3.select("#country-line")
-              .text(null);
-            })
-        .on("click",function(){
-              chosen_states.splice(chosen_states.indexOf(inputData.MajorArea), 1 )
-              d3.select(this)
-                .remove();
-            });
+  if(!chosen_states.includes(state)){
+        chosen_states.push(state)
+        
+        createLineChart(state);
     }
-
 }
 
-function createLineChart(){
+function createLineChart(state){
     var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
     var yLinepad=30;
     var xLinepad_right=60;
     var xLinepad_left=20;
-    d3.selectAll(".line").remove();
-    console.log(inputData);
+    //d3.selectAll(".line").remove();
 
     var xLineScale = d3.scalePoint()
         .domain(years)
         .range([xLinepad_right,svgLineBounds.width-xLinepad_left]);
 
-    var yLineScale = d3.scaleLinear()
-        .domain([0, (d3.max(d3.values(inputData))).migrant_percentage])
+    yLineScale = d3.scaleLinear()
+        .domain([0, (d3.max(allSelectedData, function(d){ return d.migrant_percentage}))])
         .range([svgLineBounds.height-yLinepad, yLinepad]);
 
     xLineGenerator = d3.line()
         .x(function (d) {
-            console.log("1 "+ xLineScale(d.migrant_year));
             return (xLineScale(d.migrant_year));
         })
         .y(function (d) {
             return (yLineScale(d.migrant_percentage));
-        })
+     })
 
     var xLineAxis = d3.select("#xLineAxis")
         .call(d3.axisBottom()
@@ -163,11 +142,51 @@ function createLineChart(){
         .call(d3.axisBottom().scale(xLineScale)
             .tickSize(-svgLineBounds.height+2*yLinepad)
             .tickFormat(""));
+    
     d3.select("#yLineAxis").append("g")
         .classed("grat",true)
         .call(d3.axisLeft().scale(yLineScale)
             .tickSize(-svgLineBounds.width+xLinepad_right)
             .tickFormat(""));
+    chosen_states.forEach(function(s){
+        tempData=[];
+        allSelectedData.filter(function(d){
+            if(s==d.migrant_Area)
+                  tempData.push(d);
+        });
+
+        d3.select(getId(s))
+        .attr("d", xLineGenerator(tempData));
+
+    })
+
+    d3.select("#lines")
+        .append("path")
+        .attr("class", "line")
+        .attr('id', newId(state))
+        .attr("d", xLineGenerator(lastSelectedData))
+        .on("mouseover",function(){
+              d3.select("#country-line")
+              .text(state);
+            })
+        .on("mouseout",function(){
+              d3.select("#country-line")
+              .text(null);
+            })
+        .on("click",function(){
+              chosen_states.splice(chosen_states.indexOf(state), 1 )
+
+              allSelectedData = allSelectedData.filter(function(d){
+                return d.migrant_Area!=state;
+              })
+
+              lastSelectedData=[];
+
+              createLineChart()
+
+              d3.select(this)
+                .remove();
+            });
 }
 
 function loadMap(){
@@ -195,8 +214,8 @@ function loadDataMap(){
           migrantForeachState=file1;
           areaNotConsidered=file2
           codeName=file3;
-          select_state();
-          createLineChart();
+//          select_state("Italy");
+//          createLineChart();
         }
 
       });
