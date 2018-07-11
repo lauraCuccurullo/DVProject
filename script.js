@@ -28,7 +28,7 @@ function changeInput(){
 
 
 function drawMap(world) {
-    projection = d3.geoEquirectangular();
+    projection = d3.geoEquirectangular()
 
     var map = d3.select("#map"),
     path = d3.geoPath().projection(projection),
@@ -72,7 +72,10 @@ function show_charts(){
     update_year();
     d3.select("#bar-chart").classed("invisible",false);
     d3.select("#line-chart").classed("invisible",false);
-    d3.select("#map-container").classed("hide",true);
+    d3.select("#map-container")       
+     .transition()
+     .duration(1000)
+     .style("opacity", "0.3");
     createBarChart();
     createLineChart();
 }
@@ -184,26 +187,33 @@ function createBarChart(){
 
     var bars = d3.select("#bars")
         .selectAll("rect")
-        .data(emigrInYear)
+        .data(emigrInYear);
+
     bars.exit().remove();
     bars.enter().append("rect");
 
     d3.select("#bars")
         .selectAll("rect")
         .data(emigrInYear)
-        .attr("height", yScale.bandwidth())
-        .attr("y", function(d){return (yScale(d.migrant_area))})
-        .attr("width",  function(d){return (xScale(d.migrant_number))})
-        .attr('val', function(d) {return d.migrant_number})
         .classed("rect",true)
-        .attr("id",function(d){return newId(d.migrant_area,"bar");})
-        .attr("x", xBarpad)
-        .style("fill", function(d){return colorScale(d.migrant_number)})
         .on("click",function(d){
               new_line(d.migrant_area);
               line = d3.select(getId(d.migrant_area,"line"))
               line.classed("highlight", !line.classed("highlight"));
-              });
+              })
+        .transition()
+        .delay(function(d, i) {
+          return i / allMigrantStock.length * 1000;
+        })
+        .duration(1000)
+        .attr("height", yScale.bandwidth())
+        .attr("y", function(d){return (yScale(d.migrant_area))})
+        .attr("width",  function(d){return (xScale(d.migrant_number))})
+        .attr('val', function(d) {return d.migrant_number})
+        .attr("id",function(d){return newId(d.migrant_area,"bar");})
+        .attr("x", xBarpad)
+        .style("fill", function(d){return colorScale(d.migrant_number)});
+
     texts= d3.select("#bars")
         .selectAll("text")
         .data(emigrInYear);
@@ -213,6 +223,11 @@ function createBarChart(){
         .selectAll("text")
         .data(emigrInYear)
         .classed("bar-tooltip",true)
+        .transition()
+        .delay(function(d, i) {
+          return i / allMigrantStock.length * 1000;
+        })
+        .duration(500)
         .attr("y", function(d){return yScale(d.migrant_area)+(yScale.bandwidth()/2)})
         .attr("x", function(d){return xScale(d.migrant_number)+xBarpad+10})
         .text(function(d){return d.migrant_number;});
@@ -233,8 +248,6 @@ function new_line(chosenState){
         d3.select("#lines")
         .append("path")
         .attr("class", "line")
-        .attr('id', newId(chosenState,"line"))
-        .attr("d", xLineGenerator(emigrFromState))
         .on("mouseover",function(){
               d3.select("#country-line")
               .text(chosenState);
@@ -247,7 +260,9 @@ function new_line(chosenState){
               chosen_states.splice(chosen_states.indexOf(chosenState), 1 )
               d3.select(this)
                 .remove();
-            });
+            })
+        .attr('id', newId(chosenState,"line"))
+        .attr("d", xLineGenerator(emigrFromState));
     }
 
 }
@@ -281,12 +296,16 @@ function createLineChart(){
     var xLineAxis = d3.select("#xLineAxis")
         .call(d3.axisBottom()
             .scale(xLineScale))
+        .on("click",function(d){year=d; show_charts();})
+        .transition()
+        .duration(750)
         .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")")
         .selectAll("text")
-        .attr("cursor","pointer")
-        .on("click",function(d){year=d; show_charts();});
+        .attr("cursor","pointer");
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
+        .transition()
+        .duration(1000)
         .attr("transform", "translate (" + (xLinepad_right) +", 0)");
 
     d3.select("#xLineAxis").append("g")

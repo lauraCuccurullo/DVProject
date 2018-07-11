@@ -11,6 +11,7 @@ var yLineScale;
 var xLineGenerator;
 var paesi;
 var expanded_continents=[];
+var continents_area;
 
 function getId(d){
     id="#line-"+d;
@@ -19,7 +20,6 @@ function getId(d){
 function newId(d){
     return(getId(d).replace(/#/g, ""));
 }
-
 
 function select_state(state){
    migrantForeachState.forEach(function(d){
@@ -253,7 +253,8 @@ function loadDataMap(){
       q.defer(d3.csv,"data/MajorArea.csv");
       q.defer(d3.csv,"data/CountryCodeName.csv");
       q.defer(d3.csv,"data/paesi.csv");
-      q.await(function(error,file1,file2,file3, file4) {
+      q.defer(d3.csv,"data/continents_area.csv");
+      q.await(function(error,file1,file2,file3, file4, file5) {
         if (error){
             console.log(error);
             throw error;
@@ -264,10 +265,54 @@ function loadDataMap(){
           areaNotConsidered=file2
           codeName=file3;
           paesi=file4;
+          continents_area=file5;
           createIndex();
-//          select_state("Italy");
-//          createLineChart();
+
+          d3.selectAll(".dropdown-menu").selectAll("li")
+          .attr("class", "dropdown-submenu");
+      
+      continents_area.forEach(function(d){
+        a="#"+(d.area).replace(" ","-");
+        var region = d3.select(a);
+
+        region.append("a")
+          .attr("href", "#")
+          .attr("aria-expanded", false)
+          .attr("aria-haspopup", true)
+          .attr("data-toggle", "dropdown")
+          .attr("role", "button")
+          .attr("class", "major-area")
+//          .attr("class", "dropdown-toggle")
+          .text(d.area);
+
+        var part=region.append("ul").attr("class", "dropdown-menu");
+
+        paesi.forEach(function(f){
+
+          if (f.Area==d.area){
+
+            state=(f.State).replace(" ","-");
+
+            part.append("li")
+            .attr("id", state)
+            .append("a")
+            .attr("href", "#")
+            .text(f.State);
+          }
+        })
+      })
+
         }
 
       });
+
+      //CODICE NAV BAR
+
+      // $(document).ready(function(){
+      //   $('.dropdown-submenu a.major-area').on("click", function(e){
+      //     $(this).next('ul').toggle();
+      //     e.stopPropagation();
+      //     e.preventDefault();
+      //   });
+      // });
   }
