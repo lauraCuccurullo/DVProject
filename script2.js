@@ -9,6 +9,9 @@ var years = ["1990", "1995", "2000", "2005", "2010", "2015", "2017"];
 var chosen_states=[];
 var yLineScale;
 var xLineGenerator;
+var paesi;
+var expanded_continents=[];
+var continents_area;
 
 function getId(d){
     id="#line-"+d;
@@ -17,7 +20,6 @@ function getId(d){
 function newId(d){
     return(getId(d).replace(/#/g, ""));
 }
-
 
 function select_state(state){
    migrantForeachState.forEach(function(d){
@@ -189,6 +191,52 @@ function createLineChart(state){
             });
 }
 
+
+function createIndex(){
+    continent_array = d3.map(paesi, function(d){return d.Area}).keys()
+    for(i=0;i<continent_array.length;i++)
+        expanded_continents[continent_array[i]]=false;
+    var continenti = d3.select("#index2")
+        .selectAll(".areas2")
+        .data(continent_array);
+
+    continenti.enter()
+        .append("span")
+        .classed("areas2",true)
+        .each(function(d){
+          d3.select(this)
+            .attr("id","index-"+d)
+            .append("span")
+            .classed("area-name2",true)
+            .text(function(d) { return d;})
+            .attr("text-anchor", "middle")
+            .on("click", function(){
+                d3.select("#index2").selectAll(".areas2")
+                  .filter(function(d){ if(d!==this.parentNode) return d;})
+                  .selectAll(".state-name2")
+                  .classed("invisible",true);
+                states=d3.select(this.parentNode)
+                  .selectAll(".state-name2");
+                states.classed("invisible", !states.classed("invisible"));
+            });
+          d3.select(this)
+            .selectAll(".states2")
+            .data(paesi.filter(function (p) { return (p.Area==d);}))
+            .enter().append("div")
+            .classed("state-name2",true)
+            .classed("invisible",true)
+            .text(function(d) {return d.State})
+            .on("click", function (d) {state=d.State; show_charts();});
+          }
+        )
+}
+
+
+
+
+
+
+
 function loadMap(){
   d3.json("data/world.json", function (error, world) {
       if (error) {
@@ -204,7 +252,9 @@ function loadDataMap(){
       q.defer(d3.csv,"data/UN_MigrantStockTotal_2017.csv");
       q.defer(d3.csv,"data/MajorArea.csv");
       q.defer(d3.csv,"data/CountryCodeName.csv");
-      q.await(function(error,file1,file2,file3) {
+      q.defer(d3.csv,"data/paesi.csv");
+      q.defer(d3.csv,"data/continents_area.csv");
+      q.await(function(error,file1,file2,file3, file4, file5) {
         if (error){
             console.log(error);
             throw error;
@@ -214,9 +264,55 @@ function loadDataMap(){
           migrantForeachState=file1;
           areaNotConsidered=file2
           codeName=file3;
-//          select_state("Italy");
-//          createLineChart();
+          paesi=file4;
+          continents_area=file5;
+          createIndex();
+
+          d3.selectAll(".dropdown-menu").selectAll("li")
+          .attr("class", "dropdown-submenu");
+      
+      continents_area.forEach(function(d){
+        a="#"+(d.area).replace(" ","-");
+        var region = d3.select(a);
+
+        region.append("a")
+          .attr("href", "#")
+          .attr("aria-expanded", false)
+          .attr("aria-haspopup", true)
+          .attr("data-toggle", "dropdown")
+          .attr("role", "button")
+          .attr("class", "major-area")
+//          .attr("class", "dropdown-toggle")
+          .text(d.area);
+
+        var part=region.append("ul").attr("class", "dropdown-menu");
+
+        paesi.forEach(function(f){
+
+          if (f.Area==d.area){
+
+            state=(f.State).replace(" ","-");
+
+            part.append("li")
+            .attr("id", state)
+            .append("a")
+            .attr("href", "#")
+            .text(f.State);
+          }
+        })
+      })
+
         }
 
       });
+
+      //CODICE NAV BAR
+
+      // $(document).ready(function(){
+      //   $('.dropdown-submenu a.major-area').on("click", function(e){
+      //     $(this).next('ul').toggle();
+      //     e.stopPropagation();
+      //     e.preventDefault();
+      //   });
+      // });
   }
