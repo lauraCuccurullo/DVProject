@@ -1,17 +1,19 @@
-#map-container{
+#pie-chart {
     position: absolute;
-    left: 17%;
+    left: 0%;
     top:10%;
-    width:80%;
-    height:100%;
-    float:right;
-    z-index: -1;
+    width: 20%;
+    height: 80%;
+    border-width: 1px;
+    border-color: #d9d9d9;
+    font-weight: bold;
 }
 
-#map-containers{
+#map-container{
     position: absolute;
+    left: 21%;
     top:10%;
-    width:70%;
+    width:80%;
     height:100%;
     float:right;
     z-index: -1;
@@ -37,7 +39,6 @@
     width: 15%;
     height: 100%;
     padding: 1%;
-
     border-width: 1px;
     border-color: #d9d9d9;
     border-right-style: solid;
@@ -110,17 +111,6 @@
     stroke-width:3px;
 
 }
-/*PIECHART*/
-
-
-#pie-chart {
-    float: left;
-    width: 550px;
-    height: 550px;
-    border-width: 1px;
-    border-color: #d9d9d9;
-}
-
 
 @font-face {
     font-family: 'Shrikhand', cursive;

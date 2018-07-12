@@ -9,7 +9,7 @@ var agePercentage=[];
 var paesi;
 var expanded_continents=[];
 var year="2017"
-var state="Italy"
+var state=null;
 var chosen_states=[]
 var threshold=1000;
 var emigrates;
@@ -67,8 +67,13 @@ function hide_charts(){
     d3.select("#map-container").classed("hide",false);
 }
 
-function show_charts(){
-    update_state();
+function show_charts(y){
+    year=y||year;
+    console.log(state)
+    if (!state) return;
+    console.log(year)
+
+    update_state()
     update_year();
     d3.select("#bar-chart").classed("invisible",false);
     d3.select("#line-chart").classed("invisible",false);
@@ -78,7 +83,9 @@ function show_charts(){
      .style("opacity", "0.3");
     createBarChart();
     createLineChart();
+    createPieChart()
 }
+
 function update_year(){
   d3.selectAll(".selected-year")
       .text(year);
@@ -137,15 +144,15 @@ function update_state(){
 
             }
         });
-    // ageMigrantStock.forEach(function(d){
-    //
-    //     if(d.MajorArea==s && d.Year==year){
-    //         agePercentage.push(d.sectionOne)
-    //         agePercentage.push(d.sectionTwo)
-    //         agePercentage.push(d.sectionThree)
-    //         agePercentage.push(d.sectionFour)
-    //     }
-    // })
+    ageMigrantStock.forEach(function(d){
+    
+      if(d.MajorArea==state && d.Year==year){
+          agePercentage.push(d.sectionOne)
+          agePercentage.push(d.sectionTwo)
+          agePercentage.push(d.sectionThree)
+          agePercentage.push(d.sectionFour)
+      }
+    })
   chosen_states=[];
   }
 
@@ -312,11 +319,12 @@ function createLineChart(){
     var xLineAxis = d3.select("#xLineAxis")
         .call(d3.axisBottom()
             .scale(xLineScale))
-        .on("click",function(d){year=d; show_charts();})
         .transition()
         .duration(750)
-        .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")")
-        .selectAll("text")
+        .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")");
+
+    d3.select("#xLineAxis").selectAll("text")
+        .on("click",function(d){console.log(this);year=d; show_charts();})
         .attr("cursor","pointer");
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
@@ -363,7 +371,7 @@ function createLineChart(){
 function createPieChart(){
 
     var svgPieBounds = d3.select("#pieChart").node().getBoundingClientRect();
-    //---PIE CHART
+
     d3.select("#pie").selectAll("path").remove();
 
     var outerRadius = svgPieBounds.width / 2;
@@ -376,7 +384,7 @@ function createPieChart(){
     var pie = d3.pie();
 
     var pieChart = d3.select("#pie")
-            .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+        .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
 
     var colors = d3.scaleOrdinal(["#f3e59d", "#e5c16e", "#d89941", "#c6590b"]);
 
@@ -408,12 +416,15 @@ function loadData(){
       q.defer(d3.csv,"data/DEstinatioOrigin-1.csv");
       q.defer(d3.csv,"data/CountryCodeName.csv")
       q.defer(d3.csv,"data/continents_area.csv");
-      q.await(function(error,file1,file2,file3,file4, file5, file6, file7) {
+      q.defer(d3.csv,"data/UN_MigrantStockByAge_2017.csv");
+      
+      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8) {
         if (error){
             console.log(error);
             throw error;
         }
         else {
+
           emigrates=file1;
           immigrates=file5;
           allMigrantStock=file1;
@@ -425,39 +436,68 @@ function loadData(){
           continents_area=file7;
           drawMap(file4);
 
+          ageMigrantStock=file8;
+
+          ageMigrantStock.forEach(function (d) {
+
+            d.sectionOne= +(d["0-4"]);
+            d.sectionOne+= +(d["5-9"]);
+            d.sectionOne+= +(d["10-14"]);
+            d.sectionOne= (Math.round(d.sectionOne*10))/10;
+
+            d.sectionTwo= +(d["15-19"]);
+            d.sectionTwo+= +(d["20-24"]);
+            d.sectionTwo+= +(d["25-29"]);
+            d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
+
+            d.sectionThree= +(d["30-34"]);
+            d.sectionThree+= +(d["35-39"]);
+            d.sectionThree+= +(d["40-44"]);
+            d.sectionThree+= +(d["45-49"]);
+            d.sectionThree+= +(d["50-54"]);
+            d.sectionThree= (Math.round(d.sectionThree*10))/10;
+
+            d.sectionFour= +(d["55-59"]);
+            d.sectionFour+= +(d["60-64"]);
+            d.sectionFour+= +(d["65-69"]);
+            d.sectionFour+= +(d["70-74"]);
+            d.sectionFour+= +(d["75+"]);
+            d.sectionFour= (Math.round(d.sectionFour*10))/10;
+
+          })
 
           d3.selectAll(".dropdown-menu").selectAll("li")
           .attr("class", "dropdown-submenu");
       
-      continents_area.forEach(function(d){
-        
-        a="#"+(d.area).replace(" ","-");
-        var region = d3.select(a);
+          continents_area.forEach(function(d){
+            
+            a="#"+(d.area).replace(" ","-");
+            var region = d3.select(a);
 
-        region.append("a")
-          .attr("href", "#")
-          .attr("tabindex", "-1")
-          .attr("class", "major-area")
-          .text(d.area);
+            region.append("a")
+              .attr("href", "#")
+              .attr("tabindex", "-1")
+              .attr("class", "major-area")
+              .text(d.area);
 
-        var part=region.append("ul").attr("class", "dropdown-menu");
+            var part=region.append("ul").attr("class", "dropdown-menu");
 
-        paesi.forEach(function(f){
+            paesi.forEach(function(f){
 
-          if (f.Area==d.area){
+              if (f.Area==d.area){
 
-            state=(f.State).replace(" ","-");
+                nation=(f.State).replace(" ","-");
 
-            part.append("li")
-            .attr("id", state)
-            .attr("class", "dropdown-submenu")
-            .append("a")
-            .attr("href", "#")
-            .attr("tabindex", "-1")
-            .text(f.State)
-            .on("click", function(){
-              state=f.State; show_charts();
-            })
+                part.append("li")
+                .attr("id", nation)
+                .attr("class", "dropdown-submenu")
+                .append("a")
+                .attr("href", "#")
+                .attr("tabindex", "-1")
+                .text(f.State)
+                .on("click", function(){
+                  state=f.State; show_charts();
+                })
         }
       })
     })
@@ -472,43 +512,4 @@ function loadData(){
 
    }
   });
-  }
-
-
-
-
-
-// Load CSV file on migrant age
-// d3.csv("data/UN_MigrantStockByAge_2017.csv", function (error, csv) {
-//         if (error) {
-//         console.log(error);  //Log the error.
-//         throw error;
-//     }
-//
-//     csv.forEach(function (d) {
-//
-//         d.sectionOne= +(d["0-4"]);
-//         d.sectionOne+= +(d["5-9"]);
-//         d.sectionOne+= +(d["10-14"]);
-//         d.sectionOne= (Math.round(d.sectionOne*10))/10;
-//
-//         d.sectionTwo= +(d["15-19"]);
-//         d.sectionTwo+= +(d["20-24"]);
-//         d.sectionTwo+= +(d["25-29"]);
-//         d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
-//
-//         d.sectionThree= +(d["30-34"]);
-//         d.sectionThree+= +(d["35-39"]);
-//         d.sectionThree+= +(d["40-44"]);
-//         d.sectionThree+= +(d["45-49"]);
-//         d.sectionThree+= +(d["50-54"]);
-//         d.sectionThree= (Math.round(d.sectionThree*10))/10;
-//
-//         d.sectionFour= +(d["55-59"]);
-//         d.sectionFour+= +(d["60-64"]);
-//         d.sectionFour+= +(d["65-69"]);
-//         d.sectionFour+= +(d["70-74"]);
-//         d.sectionFour+= +(d["75+"]);
-//         d.sectionFour= (Math.round(d.sectionFour*10))/10;
-//
-//     })
+}

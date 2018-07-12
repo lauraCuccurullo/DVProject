@@ -19,13 +19,7 @@
 <body onload="loadData();">
 
 <header>
-    <div>
-      <form onchange="changeInput()">
-          Immigration <input type="radio" id= "immigration" name="migrant" value="Immigration"/>
-          Emigration <input type="radio" name="migrant" value="Emigration"/ checked>
-      </form>
-      <button id="returnMap" type="button" onclick="hide_charts();"> return to map </button>
-      <div>
+
 </header>
 
 <nav class="navbar navbar-default">
@@ -80,12 +74,37 @@
           </ul>
         </li>
       </ul>
+      <ul  class="nav navbar-nav">
+        <li> <a onclick="show_charts('1990')">1990</a>  </li>
+        <li> <a onclick="show_charts('1995')">1995</a>  </li>
+        <li> <a onclick="show_charts('2000')">2000</a>  </li>
+        <li> <a onclick="show_charts('2005')">2005</a>  </li>
+        <li> <a onclick="show_charts('2010')">2010</a>  </li>
+        <li> <a onclick="show_charts('2015')">2015</a>  </li>
+        <li> <a onclick="show_charts('2017')">2017</a>  </li>
+      </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="http://localhost/DV_Project/Page2.html">Page 2</a></li>
+        <li>
+        <form onchange="changeInput()">
+            Immigration <input type="radio" id= "immigration" name="migrant" value="Immigration"/>
+            Emigration <input type="radio" name="migrant" value="Emigration"/ checked>
+        </form>
+      </li>
+      <li>
+        <button id="returnMap" type="button" onclick="hide_charts();"> return to map </button>
+      </li>
+        <li><a href="Page2.html">Page 2</a></li>
       </ul>
     </div>
   </div>
 </nav>
+
+<div id="pie-chart" class="view">
+    <h3> Age distribution</h3>
+    <svg width="100%" height="90%" id="pieChart">
+        <g id="pie"></g>
+    </svg>
+</div>
 
 <span id="map-container" class="view" onclick="show_charts()">
     <svg id="map" width="100%" height="100%">
@@ -117,19 +136,6 @@
         <g id="lines"></g>
     </svg>
 </span>
-
-
-<!-- <div id="pie-chart" class="view">
-    <div id="plot-selector-pie">
-    </div>
-
-    <svg width="300" height="300" id="pieChart">
-        <g id="pie"></g>
-    </svg>
-</div> -->
-
-
-
 
 </body>
 </html>
