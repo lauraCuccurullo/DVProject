@@ -10,6 +10,10 @@
     <script type="text/javascript" src="d3/d3-selection-multi.js"></script>
     <script type="text/javascript" src="d3/topojson.js"></script>
     <script type="application/javascript" src="script.js?version=1"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 </head>
 
 <body onload="loadData();">
@@ -24,16 +28,65 @@
       <div>
 </header>
 
-<div id="index-container" class="view">
-    <h2>Indice</h2>
-    <div id="index"></div>
-</div>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+      </button>
+      <a class="navbar-brand" href="#">Migrant</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li class="dropdown">
+          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">America</a>
+          <ul class="dropdown-menu">
+            <li id ="Latin-America-and-the-Caribbean"></li>
+            <li id ="Central-America"></li>
+            <li id ="South-America"></li>
+            <li id ="Northern-America"></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Europe</a>
+          <ul class="dropdown-menu">
+            <li id="Eastern-Europe" ></li>
+            <li id="Northern-Europe"></li>
+            <li id="Southern-Europe"></li>
+            <li id="Western-Europe" ></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Africa</a>
+          <ul class="dropdown-menu">
+            <li id="Eastern-Africa"></li>
+            <li id="Northern-Africa"></li>
+            <li id="Middle-Africa" ></li>
+            <li id="Western-Africa"></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Asia</a>
+          <ul class="dropdown-menu">
+            <li id="Eastern-Asia"></li>
+            <li id="Central-Asia"></li>
+            <li id="South-Eastern-Asia"></li>
+            <li id="Western-Asia"></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Oceania</a>
+          <ul class="dropdown-menu">
+            <li id="Oceania"></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="http://localhost/DV_Project/Page2.html">Page 2</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-<!-- <div id="chort-chart" class="view">
-    <h2>Chort Chart</h2>
-    <svg width="200" height="200">
-    </svg>
-</div> -->
 <span id="map-container" class="view" onclick="show_charts()">
     <svg id="map" width="100%" height="100%">
     </svg>

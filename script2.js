@@ -131,12 +131,16 @@ function createLineChart(state){
     var xLineAxis = d3.select("#xLineAxis")
         .call(d3.axisBottom()
             .scale(xLineScale))
+        .on("click",function(d){year=d;})
+        .transition()
+        .duration(750)
         .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")")
         .selectAll("text")
-        .attr("cursor","pointer")
-        .on("click",function(d){year=d;});
+        .attr("cursor","pointer");
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
+        .transition()
+        .duration(1000)
         .attr("transform", "translate (" + (xLinepad_right) +", 0)");
 
     d3.select("#xLineAxis").append("g")
@@ -163,10 +167,7 @@ function createLineChart(state){
     })
 
     d3.select("#lines")
-        .append("path")
-        .attr("class", "line")
-        .attr('id', newId(state))
-        .attr("d", xLineGenerator(lastSelectedData))
+        .append("path") 
         .on("mouseover",function(){
               d3.select("#country-line")
               .text(state);
@@ -188,47 +189,10 @@ function createLineChart(state){
 
               d3.select(this)
                 .remove();
-            });
-}
-
-
-function createIndex(){
-    continent_array = d3.map(paesi, function(d){return d.Area}).keys()
-    for(i=0;i<continent_array.length;i++)
-        expanded_continents[continent_array[i]]=false;
-    var continenti = d3.select("#index2")
-        .selectAll(".areas2")
-        .data(continent_array);
-
-    continenti.enter()
-        .append("span")
-        .classed("areas2",true)
-        .each(function(d){
-          d3.select(this)
-            .attr("id","index-"+d)
-            .append("span")
-            .classed("area-name2",true)
-            .text(function(d) { return d;})
-            .attr("text-anchor", "middle")
-            .on("click", function(){
-                d3.select("#index2").selectAll(".areas2")
-                  .filter(function(d){ if(d!==this.parentNode) return d;})
-                  .selectAll(".state-name2")
-                  .classed("invisible",true);
-                states=d3.select(this.parentNode)
-                  .selectAll(".state-name2");
-                states.classed("invisible", !states.classed("invisible"));
-            });
-          d3.select(this)
-            .selectAll(".states2")
-            .data(paesi.filter(function (p) { return (p.Area==d);}))
-            .enter().append("div")
-            .classed("state-name2",true)
-            .classed("invisible",true)
-            .text(function(d) {return d.State})
-            .on("click", function (d) {state=d.State; show_charts();});
-          }
-        )
+            }) 
+        .attr("class", "line")
+        .attr('id', newId(state))
+        .attr("d", xLineGenerator(lastSelectedData))
 }
 
 function loadMap(){
@@ -260,7 +224,6 @@ function loadDataMap(){
           codeName=file3;
           paesi=file4;
           continents_area=file5;
-          createIndex();
 
           d3.selectAll(".dropdown-menu").selectAll("li")
           .attr("class", "dropdown-submenu");
