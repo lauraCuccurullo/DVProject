@@ -41,7 +41,7 @@ function drawMap(world) {
                 if (!(areaNotConsidered.includes(d.MajorArea))) return d[selectedYear];
         })])
         .interpolate(d3.interpolateHcl)
-        .range([d3.rgb('#0aaaff'),d3.rgb("#000040")]);
+        .range([d3.rgb('#8bd3f9'),d3.rgb("#28288c")]);
 
     projection = d3.geoEquirectangular();
 
@@ -231,12 +231,6 @@ function createIndex(){
         )
 }
 
-
-
-
-
-
-
 function loadMap(){
   d3.json("data/world.json", function (error, world) {
       if (error) {
@@ -272,17 +266,14 @@ function loadDataMap(){
           .attr("class", "dropdown-submenu");
       
       continents_area.forEach(function(d){
+        
         a="#"+(d.area).replace(" ","-");
         var region = d3.select(a);
 
         region.append("a")
           .attr("href", "#")
-          .attr("aria-expanded", false)
-          .attr("aria-haspopup", true)
-          .attr("data-toggle", "dropdown")
-          .attr("role", "button")
+          .attr("tabindex", "-1")
           .attr("class", "major-area")
-//          .attr("class", "dropdown-toggle")
           .text(d.area);
 
         var part=region.append("ul").attr("class", "dropdown-menu");
@@ -295,24 +286,34 @@ function loadDataMap(){
 
             part.append("li")
             .attr("id", state)
+            .attr("class", "dropdown-submenu")
             .append("a")
             .attr("href", "#")
-            .text(f.State);
-          }
-        })
-      })
+            .attr("tabindex", "-1")
+            .text(f.State)
+            .on("click", function(){
 
+              lastSelectedData=[];
+              select_state(f.State);
+              return new_line(f.State);
+            })
         }
+      })
+    })
+
+    
+    $(document).ready(function(){
+        $('.dropdown-submenu a.major-area').on("click", function(e){
+          $(this).next('ul').toggle();
+          e.stopPropagation();
+          e.preventDefault();
+        });
+      });
+   }
 
       });
 
       //CODICE NAV BAR
 
-      // $(document).ready(function(){
-      //   $('.dropdown-submenu a.major-area').on("click", function(e){
-      //     $(this).next('ul').toggle();
-      //     e.stopPropagation();
-      //     e.preventDefault();
-      //   });
-      // });
+      
   }
