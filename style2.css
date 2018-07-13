@@ -78,6 +78,14 @@
 
 }
 
+.clicked{
+    fill:yellow;
+}
+
+a{
+    cursor: pointer;
+}
+
 @font-face {
     font-family: 'Shrikhand', cursive;
     src: url('Shrikhand-Regular.ttf');
