@@ -14,6 +14,7 @@ var chosen_states=[]
 var threshold=1000;
 var emigrates;
 var immigrates;
+var gender_percentage;
 
 function changeInput(){
     if(document.getElementById("immigration").checked){
@@ -28,13 +29,18 @@ function changeInput(){
 
 
 function drawMap(world) {
-    projection = d3.geoEquirectangular()
+
+  var svgMapBounds = d3.select("#map").node().getBoundingClientRect();
+
+  projection = d3.geoEquirectangular().scale(170)
+    .translate([svgMapBounds.width/2,svgMapBounds.height/2])
 
     var map = d3.select("#map"),
     path = d3.geoPath().projection(projection),
     g = map.append("g");
 
     g.append("path")
+        .attr("width", svgMapBounds.width)
         .attr("id", "graticule")
         .attr("class", "grat")
         .attr("fill", "none")
@@ -62,21 +68,20 @@ function drawMap(world) {
 }
 
 function hide_charts(){
-    d3.select("#bar-chart").classed("invisible",true);
-    d3.select("#line-chart").classed("invisible",true);
-    d3.select("#map-container").classed("hide",false);
+    d3.select("#chart-container").classed("invisible",true);
+    d3.select("#map-container")       
+     .transition()
+     .duration(1000)
+     .style("opacity", "1");
 }
 
 function show_charts(y){
     year=y||year;
-    console.log(state)
     if (!state) return;
-    console.log(year)
 
     update_state()
     update_year();
-    d3.select("#bar-chart").classed("invisible",false);
-    d3.select("#line-chart").classed("invisible",false);
+    d3.select("#chart-container").classed("invisible",false);
     d3.select("#map-container")       
      .transition()
      .duration(1000)
@@ -84,6 +89,7 @@ function show_charts(y){
     createBarChart();
     createLineChart();
     createPieChart()
+    createPieChartGender()
 }
 
 function update_year(){
@@ -324,7 +330,7 @@ function createLineChart(){
         .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")");
 
     d3.select("#xLineAxis").selectAll("text")
-        .on("click",function(d){console.log(this);year=d; show_charts();})
+        .on("click",function(d){year=d; show_charts();})
         .attr("cursor","pointer");
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
@@ -406,6 +412,52 @@ function createPieChart(){
     .text(function(d, i) { return ageRange[i]; });
 }
 
+function createPieChartGender(){
+    perc=[]
+    gender_percentage.forEach(function(d){
+      if(d.MajorArea==state){
+        female=+((d[year]).replace(",","."))
+        perc.push(female); 
+        perc.push(100-female);
+      }
+    })
+
+    var svgPieBounds = d3.select("#pieChartGender").node().getBoundingClientRect();
+
+    d3.select("#pieGender").selectAll("path").remove();
+
+    var outerRadius = svgPieBounds.width / 2;
+    var innerRadius = 0;
+
+    var arc = d3.arc()
+        .innerRadius(innerRadius)
+        .outerRadius(outerRadius);
+
+    var pie = d3.pie();
+
+    var pieChart = d3.select("#pieGender")
+        .attr("transform", "translate(" + outerRadius + "," + outerRadius + ")");
+
+    var colors = d3.scaleOrdinal(["#ff8080", "#8080ff"]);
+
+    var arcs = pieChart.selectAll("path")
+              .data(pie(perc))
+              .enter();
+
+    arcs.append("path")
+        .attr("fill", function(d,i) { return colors(i); })
+        .attr("d", arc);
+
+    arcs.append("svg:text")
+        .attr("transform", function(d) {
+        d.innerRadius = 0;
+        d.outerRadius =100;
+        return "translate(" + arc.centroid(d) + ")";
+    })
+    .attr("text-anchor", "middle")
+    .text(function(d, i) { if (i==0 ) return "female"; else return "male" });
+}
+
 //SCELTA E MODIFICA PARAMETRI
 function loadData(){
   var q = d3.queue();
@@ -417,8 +469,8 @@ function loadData(){
       q.defer(d3.csv,"data/CountryCodeName.csv")
       q.defer(d3.csv,"data/continents_area.csv");
       q.defer(d3.csv,"data/UN_MigrantStockByAge_2017.csv");
-      
-      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8) {
+      q.defer(d3.csv,"data/gender_percentage.csv");
+      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8, file9) {
         if (error){
             console.log(error);
             throw error;
@@ -437,6 +489,7 @@ function loadData(){
           drawMap(file4);
 
           ageMigrantStock=file8;
+          gender_percentage=file9;
 
           ageMigrantStock.forEach(function (d) {
 

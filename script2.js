@@ -12,6 +12,8 @@ var xLineGenerator;
 var paesi;
 var expanded_continents=[];
 var continents_area;
+var countries;
+var w;
 
 function getId(d){
     id="#line-"+d;
@@ -19,6 +21,12 @@ function getId(d){
 }
 function newId(d){
     return(getId(d).replace(/#/g, ""));
+}
+
+function change_year(y){
+  selectedYear=y;
+  console.log("ciao1")
+  color_change();
 }
 
 function select_state(state){
@@ -32,16 +40,41 @@ function select_state(state){
    })
 }
 
-function drawMap(world) {
+function setColor(d){
 
-    var colorScale= d3.scaleLinear()
-        .domain([d3.min(migrantForeachState, function (d) {
-                return d[selectedYear];
-            }), d3.max(migrantForeachState, function (d) {
-                if (!(areaNotConsidered.includes(d.MajorArea))) return d[selectedYear];
-        })])
-        .interpolate(d3.interpolateHcl)
-        .range([d3.rgb('#8bd3f9'),d3.rgb("#28288c")]);
+  var colorScale= d3.scaleLinear()
+    .domain([d3.min(migrantForeachState, function (d) {
+            return d[selectedYear];
+        }), d3.max(migrantForeachState, function (d) {
+            if (!(areaNotConsidered.includes(d.MajorArea))) return d[selectedYear];
+    })])
+    .interpolate(d3.interpolateHcl)
+    .range([d3.rgb('#8bd3f9'),d3.rgb("#28288c")]);
+
+    var nameCountry;
+    var result;
+
+    codeName.forEach(function (f){
+        if (f.CountryCode==d.id) nameCountry=f.CountryName;
+    })
+
+    migrantForeachState.forEach(function (f){
+        if (f.MajorArea==nameCountry) result=f[selectedYear];
+    })
+
+    return colorScale(result);
+}
+
+function color_change(){
+  countries.forEach(function(d){
+    id="#"+d.id
+    if (id!="#-99")
+      d3.select(id)
+        .style("fill", setColor(d))
+  })
+}
+
+function drawMap() {
 
     projection = d3.geoEquirectangular();
 
@@ -49,13 +82,7 @@ function drawMap(world) {
     path = d3.geoPath().projection(projection),
     g = map.append("g");
 
-    g.append("path")
-        .attr("id", "graticule")
-        .attr("class", "grat")
-        .attr("fill", "none")
-        .attr("d", path(d3.geoGraticule10()));
-
-    var countries = topojson.feature(world, world.objects.countries).features
+    countries = topojson.feature(w, w.objects.countries).features
 
     g.selectAll("path")
         .data(countries)
@@ -66,32 +93,40 @@ function drawMap(world) {
         .style('fill', setColor)
         .on("mouseover", function(d,i){
                 d3.select(this).style("fill", "#ffa07a")})
-        .on("mouseout", function(){
-                d3.select(this).style('fill', setColor)})
-        .on("click", function(d){
+        .on("mouseout", function(d){
+          elem=d3.select(this)
           codeName.forEach(function (f){
             if (d.id == f.CountryCode) {
-              lastSelectedData=[];
-              select_state(f.CountryName);
-              return new_line(f.CountryName);}
+              if(!chosen_states.includes(f.CountryName)) elem.style('fill', setColor(d));
+              else elem.style('fill', "#FFFF35");
+            }
+          })
+        })                
+        .on("click", function(d){
+
+          var temp=[];
+          elem=d3.select(this) 
+
+          codeName.forEach(function (f){
+            if (d.id == f.CountryCode) {
+
+              if(chosen_states.includes(f.CountryName)) {
+                elem.style('fill', setColor(d));
+                chosen_states.splice(chosen_states.indexOf(f.CountryName), 1 )  
+                allSelectedData.forEach(function(d){
+                  if(d.migrant_Area!=f.CountryName) temp.push(d);
+                })             
+               allSelectedData=temp;
+               d3.select(getId(f.CountryName)).remove();
+              }
+              else{ 
+                elem.style('fill', "#FFFF35");
+                lastSelectedData=[];
+                select_state(f.CountryName);
+                return new_line(f.CountryName);}
+            }
           })
         });
-
-    function setColor(d){
-
-        var nameCountry;
-        var result;
-
-        codeName.forEach(function (f){
-            if (f.CountryCode==d.id) nameCountry=f.CountryName;
-        })
-
-        migrantForeachState.forEach(function (f){
-            if (f.MajorArea==nameCountry) result=f[selectedYear];
-        })
-
-        return colorScale(result);
-    }
 }
 
 //---LINE Chart
@@ -201,7 +236,8 @@ function loadMap(){
           console.log(error);
           throw error;
       }
-      drawMap(world);
+      w=world;
+      drawMap();
   });
 }
 
