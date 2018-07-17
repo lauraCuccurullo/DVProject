@@ -46,7 +46,7 @@ Cote d'Ivoire,CIV
 Latin America and the Caribbean (IFC classification),CLA
 Middle East and North Africa (IFC classification),CME
 Cameroon,CMR
-"Congo, Rep.",COG
+Rep. Dem. of the Congo,COG
 Colombia,COL
 Comoros,COM
 Cabo Verde,CPV
@@ -57,7 +57,7 @@ Cuba,CUB
 Curacao,CUW
 Cayman Islands,CYM
 Cyprus,CYP
-Czech Republic,CZE
+Czechia,CZE
 Germany,DEU
 Djibouti,DJI
 Dominica,DMA
@@ -108,7 +108,7 @@ Isle of Man,IMN
 India,IND
 Not classified,INX
 Ireland,IRL
-Iran (Islamic Republic of),IRN
+Iran,IRN
 Iraq,IRQ
 Iceland,ISL
 Israel,ISR
@@ -118,15 +118,15 @@ Jordan,JOR
 Japan,JPN
 Kazakhstan,KAZ
 Kenya,KEN
-Kyrgyz Republic,KGZ
+Kyrgyzstan,KGZ
 Cambodia,KHM
 Kiribati,KIR
 St. Kitts and Nevis,KNA
-"Korea, Rep.",KOR
+South Korea,KOR
 Kosovo,KSV
 Kuwait,KWT
 Latin America & Caribbean (developing only),LAC
-Lao PDR,LAO
+Laos,LAO
 Lebanon,LBN
 Liberia,LBR
 Libya,LBY
@@ -191,7 +191,7 @@ Palau,PLW
 Papua New Guinea,PNG
 Poland,POL
 Puerto Rico,PRI
-"Korea, Dem. Rep.",PRK
+North Korea,PRK
 Portugal,PRT
 Paraguay,PRY
 Pacific island small states,PSS
@@ -222,7 +222,7 @@ Slovak Republic,SVK
 Slovenia,SVN
 Sweden,SWE
 Swaziland,SWZ
-Laos (Dutch part),SXM
+Sint Maarten,SXM
 Seychelles,SYC
 Syrian Arab Republic,SYR
 Turks and Caicos Islands,TCA
@@ -257,3 +257,4 @@ South Africa,ZAF
 Congo,COD
 Zambia,ZMB
 Zimbabwe,ZWE
+Antarctica, ATA
