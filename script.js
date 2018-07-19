@@ -61,7 +61,7 @@ function drawMap(world) {
                 d3.select(this).style('fill', "grey")})
         .on("click", function(d){
                 codeName.forEach(function (f){
-                  if (d.id == f.CountryCode) {state=f.CountryName; return show_charts();}
+                  if (d.id == f.CountryCode) {state=f.CountryName; threshold=0; return show_charts();}
                 })
         });
 
@@ -75,9 +75,17 @@ function hide_charts(){
      .style("opacity", "1");
 }
 
+function create_charts(){
+    createBarChart();
+    createLineChart();
+    createPieChart()
+    createPieChartGender()
+}
+
 function show_charts(y){
     year=y||year;
     if (!state) return;
+    threshold=0;
 
     update_state()
     update_year();
@@ -86,10 +94,28 @@ function show_charts(y){
      .transition()
      .duration(1000)
      .style("opacity", "0.3");
-    createBarChart();
-    createLineChart();
-    createPieChart()
-    createPieChartGender()
+
+    var maxMigr = d3.max(emigrInYear, function (d) {return d.migrant_number;})
+
+    range= d3.select("#barInput");
+    
+    range
+      .attr("min", 0)
+      .attr("max", d3.max(emigrInYear, function (d) {return d.migrant_number;}))
+      .attr("list", "tickmarks")
+
+    d3.select("#tickmarks").remove();
+
+    d3.select("#range").insert('datalist', 'p')
+      .attr("id", "tickmarks");
+
+    part=maxMigr/10;
+    for (var i = 0; i < 21; i++) {
+      d3.select("#tickmarks").append("option")
+      .attr("value", (part*i));
+    }
+
+    create_charts();
 }
 
 function update_year(){
@@ -100,6 +126,7 @@ function update_year(){
       if(d.migrant_year==year)
           emigrInYear.push({ migrant_number: d.migrant_number, migrant_area: d.migrant_area })
   });
+
 }
 
 function update_state(){
@@ -551,9 +578,9 @@ function loadData(){
                 .on("click", function(){
                   state=f.State; show_charts();
                 })
-        }
-      })
-    })
+                }
+              })
+            })
     
     $(document).ready(function(){
         $('.dropdown-submenu a.major-area').on("click", function(e){
@@ -563,6 +590,14 @@ function loadData(){
         });
       });
 
-   }
-  });
+    d3.select("#barInput").on("input", function(){
+      threshold = $("#barInput").val();
+      console.log(threshold +"  c  "+ media)
+      update_state()
+      update_year();
+      create_charts();
+   });
+
+  }}
+  )
 }
