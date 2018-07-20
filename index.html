@@ -116,17 +116,19 @@
     &#10006;
   </span>
   <span id="range">
-    <input id="barInput" type="range" step=".1" style="width: 225px" />
+    <!-- <input id="barInput" type="range" step=".1" style="width: 225px" /> -->
+    <label> Add a threshold: </label>
+    <input id="barInput" type="number" step="1000" style="width: 125px"/>
     <p></p>
   </span>
 
   <span id="pie-chart">
     <h3> Age distribution</h3>
-    <svg width="80%" height="40%" id="pieChart">
+    <svg width="80%" height="38%" id="pieChart">
         <g id="pie"></g>
     </svg>
     <h3>Gender distribution</h3>
-    <svg width="80%" height="40%" id="pieChartGender">
+    <svg width="80%" height="38%" id="pieChartGender">
         <g id="pieGender"></g>
     </svg>  
 

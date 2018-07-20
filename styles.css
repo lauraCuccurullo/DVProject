@@ -21,7 +21,7 @@
 
 #pie-chart {
     position: absolute;
-    top:15%;
+    top:10%;
     left: 2%;
     width: 18%;
     height: 100%;
@@ -159,7 +159,12 @@ h3 {
     left: 6%;
 }
 
-.selected-country, .selected-year, #range{
+#range{
+    margin:auto;
+    padding-left: 30%;
+}
+
+.selected-country, .selected-year{
     font-size: 30px;
     font-family: 'Shrikhand', cursive;
     color: #008250;
@@ -177,6 +182,13 @@ header{
 
 .view {
     padding: 0.5em;
+}
+
+#tooltip {
+    position: absolute;
+
+    pointer-events: none;
+    font-size: 18px;
 }
 
 datalist, option { 

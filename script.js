@@ -97,23 +97,9 @@ function show_charts(y){
 
     var maxMigr = d3.max(emigrInYear, function (d) {return d.migrant_number;})
 
-    range= d3.select("#barInput");
-    
-    range
+    d3.select("#barInput")
       .attr("min", 0)
       .attr("max", d3.max(emigrInYear, function (d) {return d.migrant_number;}))
-      .attr("list", "tickmarks")
-
-    d3.select("#tickmarks").remove();
-
-    d3.select("#range").insert('datalist', 'p')
-      .attr("id", "tickmarks");
-
-    part=maxMigr/10;
-    for (var i = 0; i < 21; i++) {
-      d3.select("#tickmarks").append("option")
-      .attr("value", (part*i));
-    }
 
     create_charts();
 }
@@ -287,6 +273,9 @@ function createBarChart(){
 //---LINE Chart
 
 function new_line(chosenState){
+
+  var svgLineBounds = d3.select("#lineChart").node().getBoundingClientRect();
+
   if(!chosen_states.includes(chosenState)){
         chosen_states.push(chosenState)
         emigrFromState=[];
@@ -304,6 +293,21 @@ function new_line(chosenState){
               .text(chosenState);
               d3.select(getId(chosenState, "bar"))
               .classed("lineHover", true);
+
+              var coordinates = [0, 0];
+              coordinates = d3.mouse(this);
+              console.log(coordinates)
+              var x = coordinates[0];
+              var y = coordinates[1];
+
+              var xPosition = d3.event.pageX - svgLineBounds.x + 10
+              var yPosition = d3.event.pageY - svgLineBounds.y + 10
+
+            d3.select("#lineChart").insert("text", "g")
+               .attr("id", "tooltip")
+               .attr("x", xPosition)
+               .attr("y", yPosition)
+               .text(chosenState);
             })
         .on("mouseout",function(){
               d3.select(this).classed("lineHover", false);
@@ -311,6 +315,7 @@ function new_line(chosenState){
               .text(null);
               d3.select(getId(chosenState, "bar"))
               .classed("lineHover", false);
+              d3.select("#tooltip").remove();
             })
         .on("click",function(){
               chosen_states.splice(chosen_states.indexOf(chosenState), 1 )
