@@ -73,7 +73,7 @@
     stroke-width:2px;
 }
 .line:hover{
-    stroke: blue;
+    stroke: lightblue;
     stroke-width:3px;
 
 }
@@ -122,4 +122,13 @@ header{
 
 .view {
     padding: 0.5em;
+}
+
+#tooltip {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    font-size: 18px;
+    background-color: rgba(255,255,255, 0.5);
+    padding: 1px;
 }

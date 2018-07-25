@@ -296,17 +296,16 @@ function new_line(chosenState){
 
               var coordinates = [0, 0];
               coordinates = d3.mouse(this);
-              console.log(coordinates)
               var x = coordinates[0];
               var y = coordinates[1];
 
               var xPosition = d3.event.pageX - svgLineBounds.x + 10
               var yPosition = d3.event.pageY - svgLineBounds.y + 10
 
-            d3.select("#lineChart").insert("text", "g")
+            d3.select("#line-chart").insert("span", "svg")
                .attr("id", "tooltip")
-               .attr("x", xPosition)
-               .attr("y", yPosition)
+               .style("left", xPosition+'px')
+               .style("top", yPosition+'px')
                .text(chosenState);
             })
         .on("mouseout",function(){
@@ -409,8 +408,17 @@ function createLineChart(){
 function createPieChart(){
 
     var svgPieBounds = d3.select("#pieChart").node().getBoundingClientRect();
-
     d3.select("#pie").selectAll("path").remove();
+    d3.select("#pie").selectAll("text").remove();
+    d3.select("#pie-chart").selectAll("text").remove();
+
+    if (agePercentage[0]==0 && agePercentage[1]==0 && agePercentage[2]==0 && agePercentage[3]==0) {
+      d3.select('#pie-chart')
+      .insert('text', 'SVG')
+      .attr('class', 'datiMancanti')
+      .text('DATI MANCANTI')
+      return;
+    }
 
     var outerRadius = svgPieBounds.width / 2;
     var innerRadius = 0;

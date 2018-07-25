@@ -25,7 +25,6 @@ function newId(d){
 
 function change_year(y){
   selectedYear=y;
-  console.log("ciao1")
   color_change();
 }
 
@@ -41,6 +40,7 @@ function select_state(state){
 }
 
 function setColor(d){
+  console.log(d)
 
   var colorScale= d3.scaleLinear()
     .domain([d3.min(migrantForeachState, function (d) {
@@ -68,9 +68,11 @@ function setColor(d){
 function color_change(){
   countries.forEach(function(d){
     id="#"+d.id
-    if (id!="#-99")
-      d3.select(id)
-        .style("fill", setColor(d))
+    codeName.forEach(function(f){
+      if (d.id==f.CountryCode){
+        if(!chosen_states.includes(f.CountryName) && id!="#-99") d3.select(id).style("fill", setColor(d));
+      }
+    })
   })
 }
 
@@ -204,12 +206,24 @@ function createLineChart(state){
     d3.select("#lines")
         .append("path") 
         .on("mouseover",function(){
-              d3.select("#country-line")
-              .text(state);
+
+              var coordinates = [0, 0];
+              coordinates = d3.mouse(this);
+              console.log(coordinates)
+              var x = coordinates[0];
+              var y = coordinates[1];
+
+              var xPosition = d3.event.pageX - svgLineBounds.x + 10
+              var yPosition = d3.event.pageY - svgLineBounds.y + 10
+
+              d3.select("#line-charts").insert("span", "svg")
+               .attr("id", "tooltip")
+               .style("left", xPosition+'px')
+               .style("top", yPosition+'px')
+               .text(state);
             })
         .on("mouseout",function(){
-              d3.select("#country-line")
-              .text(null);
+              d3.select("#tooltip").remove();
             })
         .on("click",function(){
               chosen_states.splice(chosen_states.indexOf(state), 1 )
@@ -222,8 +236,19 @@ function createLineChart(state){
 
               createLineChart()
 
+              codeName.forEach(function(f){
+                if (state==f.CountryName){
+                  a={id:f.CountryCode};
+                  d3.select("#"+f.CountryCode).style("fill", setColor(a));
+                }
+              })
+
               d3.select(this)
                 .remove();
+
+              d3.select("#tooltip").remove();
+
+              //colore della mappa
             }) 
         .attr("class", "line")
         .attr('id', newId(state))
