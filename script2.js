@@ -147,7 +147,6 @@ function createLineChart(state){
     var yLinepad=30;
     var xLinepad_right=60;
     var xLinepad_left=20;
-    //d3.selectAll(".line").remove();
 
     var xLineScale = d3.scalePoint()
         .domain(years)
@@ -177,11 +176,13 @@ function createLineChart(state){
 
     var yLineAxis = d3.select("#yLineAxis").call(d3.axisLeft().scale(yLineScale))
         .transition()
-        .duration(1000)
+        .duration(750)
         .attr("transform", "translate (" + (xLinepad_right) +", 0)");
 
     d3.select("#xLineAxis").append("g")
         .classed("grat",true)
+        .transition()
+        .duration(750)
         .call(d3.axisBottom().scale(xLineScale)
             .tickSize(-svgLineBounds.height+2*yLinepad)
             .tickFormat(""));

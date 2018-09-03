@@ -321,6 +321,10 @@ function new_line(chosenState){
               d3.select(this)
                 .remove();
             })
+        .style("opacity", "0.1")
+        .transition()
+        .duration(1000)
+        .style("opacity", "1")
         .attr('id', newId(chosenState,"line"))
         .attr("d", xLineGenerator(emigrFromState));
     }
@@ -331,7 +335,11 @@ function createLineChart(){
     var yLinepad=30;
     var xLinepad_right=60;
     var xLinepad_left=20;
-    d3.selectAll(".line").remove();
+    d3.selectAll(".line")
+     .transition()
+     .duration(1000)
+     .style("opacity", "0.3")
+     .remove();
 
     var xLineScale = d3.scalePoint()
         .domain(emigrInState.map ( function (d) {
