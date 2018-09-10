@@ -40,7 +40,7 @@ function select_state(state){
 }
 
 function setColor(d){
-  console.log(d)
+  //console.log(d)
 
   var colorScale= d3.scaleLinear()
     .domain([d3.min(migrantForeachState, function (d) {
@@ -227,6 +227,9 @@ function createLineChart(state){
               d3.select("#tooltip").remove();
             })
         .on("click",function(){
+
+              console.log(chosen_states)
+
               chosen_states.splice(chosen_states.indexOf(state), 1 )
 
               allSelectedData = allSelectedData.filter(function(d){
@@ -238,9 +241,10 @@ function createLineChart(state){
               createLineChart()
 
               codeName.forEach(function(f){
+                
                 if (state==f.CountryName){
                   a={id:f.CountryCode};
-                  d3.select("#"+f.CountryCode).style("fill", setColor(a));
+                  d3.select("#map-containers").select("#"+f.CountryCode).style("fill", setColor(a));
                 }
               })
 
@@ -248,6 +252,8 @@ function createLineChart(state){
                 .remove();
 
               d3.select("#tooltip").remove();
+
+              //console.log(state)
 
               //colore della mappa
             }) 

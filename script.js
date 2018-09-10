@@ -318,8 +318,10 @@ function new_line(chosenState){
             })
         .on("click",function(){
               chosen_states.splice(chosen_states.indexOf(chosenState), 1 )
+              
               d3.select(this)
                 .remove();
+              d3.select("#tooltip").remove();
             })
         .style("opacity", "0.1")
         .transition()
@@ -457,7 +459,27 @@ function createPieChart(){
         return "translate(" + arc.centroid(d) + ")";
     })
     .attr("text-anchor", "middle")
-    .text(function(d, i) { return ageRange[i]; });
+    .text(function(d, i) { return ageRange[i]; })
+    .on("mouseover", function(d){
+
+        var coordinates = [0, 0];
+        coordinates = d3.mouse(this);
+        var x = coordinates[0];
+        var y = coordinates[1];
+
+        var xPosition = d3.event.pageX - svgPieBounds.x
+        var yPosition = d3.event.pageY - svgPieBounds.y
+
+      d3.select("#pie-chart").insert("span", "svg")
+         .attr("id", "tooltip-pie")
+         .style("left", xPosition+'px')
+         .style("top", yPosition+'px')
+         .text("The percentage is "+ d.value+"%");
+
+    })
+    .on("mouseout", function(d){
+       d3.select("#tooltip-pie").remove();
+    });
 }
 
 function createPieChartGender(){
@@ -503,7 +525,29 @@ function createPieChartGender(){
         return "translate(" + arc.centroid(d) + ")";
     })
     .attr("text-anchor", "middle")
-    .text(function(d, i) { if (i==0 ) return "female"; else return "male" });
+    .text(function(d, i) { if (i==0 ) return "female"; else return "male" })
+        .on("mouseover", function(d){
+
+        value=parseInt(d.value)
+
+        var coordinates = [0, 0];
+        coordinates = d3.mouse(this);
+        var x = coordinates[0];
+        var y = coordinates[1];
+
+        var xPosition = d3.event.pageX - svgPieBounds.x 
+        var yPosition = d3.event.pageY - svgPieBounds.y +200
+
+      d3.select("#pie-chart").insert("span", "svg")
+         .attr("id", "tooltip-pie")
+         .style("left", xPosition+'px')
+         .style("top", yPosition+'px')
+         .text("The percentage is "+ value+"%");
+
+    })
+    .on("mouseout", function(d){
+       d3.select("#tooltip-pie").remove();
+    });;
 }
 
 //SCELTA E MODIFICA PARAMETRI
@@ -613,7 +657,7 @@ function loadData(){
 
     d3.select("#barInput").on("input", function(){
       threshold = $("#barInput").val();
-      console.log(threshold +"  c  "+ media)
+      //console.log(threshold +"  c  "+ media)
       update_state()
       update_year();
       create_charts();
