@@ -321,6 +321,8 @@ function new_line(chosenState){
               
               d3.select(this)
                 .remove();
+              d3.select(getId(chosenState, "bar"))
+              .classed("lineHover", false);
               d3.select("#tooltip").remove();
             })
         .style("opacity", "0.1")
@@ -536,7 +538,7 @@ function createPieChartGender(){
         var y = coordinates[1];
 
         var xPosition = d3.event.pageX - svgPieBounds.x 
-        var yPosition = d3.event.pageY - svgPieBounds.y +200
+        var yPosition = d3.event.pageY - svgPieBounds.y +240
 
       d3.select("#pie-chart").insert("span", "svg")
          .attr("id", "tooltip-pie")

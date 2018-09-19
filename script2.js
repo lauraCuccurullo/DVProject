@@ -96,7 +96,11 @@ function drawMap() {
         .on("mouseover", function(d,i){
                 d3.select(this).style("fill", "#ffa07a")})
         .on("mouseout", function(d){
+          
           elem=d3.select(this)
+
+          if (d.id=="ATA" || d.id=="-99"){ elem.style('fill', "#000000");}
+
           codeName.forEach(function (f){
             if (d.id == f.CountryCode) {
               if(!chosen_states.includes(f.CountryName)) elem.style('fill', setColor(d));
@@ -167,7 +171,6 @@ function createLineChart(state){
     var xLineAxis = d3.select("#xLineAxis")
         .call(d3.axisBottom()
             .scale(xLineScale))
-        .on("click",function(d){year=d;})
         .transition()
         .duration(750)
         .attr("transform", "translate (0, " + (svgLineBounds.height-yLinepad) +")")
@@ -186,6 +189,10 @@ function createLineChart(state){
         .call(d3.axisBottom().scale(xLineScale)
             .tickSize(-svgLineBounds.height+2*yLinepad)
             .tickFormat(""));
+
+    d3.select("#xLineAxis").selectAll("text")
+        .on("click",function(d){console.log(d); change_year(d)})
+        .attr("cursor","pointer");
     
     d3.select("#yLineAxis").append("g")
         .classed("grat",true)
@@ -210,7 +217,7 @@ function createLineChart(state){
 
               var coordinates = [0, 0];
               coordinates = d3.mouse(this);
-              console.log(coordinates)
+
               var x = coordinates[0];
               var y = coordinates[1];
 
