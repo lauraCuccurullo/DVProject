@@ -308,6 +308,7 @@ function new_line(chosenState){
                .style("top", yPosition+'px')
                .text(chosenState);
             })
+
         .on("mouseout",function(){
               d3.select(this).classed("lineHover", false);
               d3.select("#country-line")
