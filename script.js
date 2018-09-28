@@ -11,9 +11,11 @@ var expanded_continents=[];
 var year="2017"
 var state=null;
 var chosen_states=[]
-var threshold=1000;
+var threshold=0;
 var emigrates;
 var immigrates;
+var immigratesFemale;
+var immigratesMale;
 var gender_percentage;
 
 function changeInput(){
@@ -25,6 +27,13 @@ function changeInput(){
     }
 
     show_charts();
+}
+
+function changeGender(){
+  if (document.getElementById("both").checked) allMigrantStock=immigrates;
+  else if (document.getElementById("male").checked) allMigrantStock=immigratesMale;
+  else allMigrantStock=immigratesFemale;
+  show_charts();
 }
 
 
@@ -61,7 +70,7 @@ function drawMap(world) {
                 d3.select(this).style('fill', "grey")})
         .on("click", function(d){
                 codeName.forEach(function (f){
-                  if (d.id == f.CountryCode) {state=f.CountryName; threshold=0; return show_charts();}
+                  if (d.id == f.CountryCode) {state=f.CountryName; return show_charts();}
                 })
         });
 
@@ -85,7 +94,6 @@ function create_charts(){
 function show_charts(y){
     year=y||year;
     if (!state) return;
-    threshold=0;
 
     update_state()
     update_year();
@@ -133,7 +141,7 @@ function update_state(){
 
             d[state] = +d[state];
 
-            if (!(areaNotConsidered.includes(d.MajorArea)) && d.MajorArea!="" && d[state]>threshold) {
+            if (!(areaNotConsidered.includes(d.MajorArea)) && d.MajorArea!="") {
                 somma+=d[state];
                 if (d[state]!=0) count+=1;
             }
@@ -146,7 +154,7 @@ function update_state(){
 
         allMigrantStock.forEach(function (d) {
 
-            if(d[state]>=(media) && !(statesInMedia.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea))){
+            if(d[state]>=(media) && d[state]>=threshold && !(statesInMedia.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea))){
                 statesInMedia.push(d.MajorArea);
               }
         });
@@ -560,12 +568,14 @@ function loadData(){
       q.defer(d3.csv,"data/MajorArea.csv");
       q.defer(d3.csv,"data/paesi.csv");
       q.defer(d3.json,"data/world.json")
-      q.defer(d3.csv,"data/DEstinatioOrigin-1.csv");
+      q.defer(d3.csv,"data/UN_MigrantStockByDestinationAndOrigin.csv");
       q.defer(d3.csv,"data/CountryCodeName.csv")
       q.defer(d3.csv,"data/continents_area.csv");
       q.defer(d3.csv,"data/UN_MigrantStockByAge_2017.csv");
       q.defer(d3.csv,"data/gender_percentage.csv");
-      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8, file9) {
+      q.defer(d3.csv,"data/UN_MigrantStockByOriginAndDestination_2017Male.csv");
+      q.defer(d3.csv,"data/UN_MigrantStockByOriginAndDestination_2017Female.csv");
+      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8, file9, file10, file11) {
         if (error){
             console.log(error);
             throw error;
@@ -574,6 +584,8 @@ function loadData(){
 
           emigrates=file1;
           immigrates=file5;
+          immigratesMale=file10;
+          immigratesFemale=file11;
           allMigrantStock=file1;
           file2.forEach(function(d){
             areaNotConsidered.push(d.MajorArea)

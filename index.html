@@ -119,7 +119,12 @@
     <!-- <input id="barInput" type="range" step=".1" style="width: 225px" /> -->
     <label> Add a threshold: </label>
     <input id="barInput" type="number" step="1000" style="width: 125px"/>
-    <p></p>
+
+    <form onchange="changeGender()">
+        <label class="navbar-link"> <input type="radio" id="both" name="genderChange" value="boh" checked/> Both </label>
+        <label class="navbar-link"> <input type="radio" id="male" name="genderChange" value="Male"/> Male </label>
+        <label class="navbar-link"> <input type="radio" id="female" name="genderChange" value="Female"/> Female </label>
+    </form>
   </span>
 
   <span id="pie-chart">
