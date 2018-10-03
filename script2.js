@@ -1,5 +1,5 @@
 var migrantForeachState;
-var codeName;
+var country_codes;
 var selectedYear="1995";
 var areaNotConsidered;
 var emigrInState=[];
@@ -9,9 +9,9 @@ var years = ["1990", "1995", "2000", "2005", "2010", "2015", "2017"];
 var chosen_states=[];
 var yLineScale;
 var xLineGenerator;
-var paesi;
+var country_area;
 var expanded_continents=[];
-var continents_area;
+var continent_area;
 var countries;
 var w;
 
@@ -54,7 +54,7 @@ function setColor(d){
     var nameCountry;
     var result;
 
-    codeName.forEach(function (f){
+    country_codes.forEach(function (f){
         if (f.CountryCode==d.id) nameCountry=f.CountryName;
     })
 
@@ -68,7 +68,7 @@ function setColor(d){
 function color_change(){
   countries.forEach(function(d){
     id="#"+d.id
-    codeName.forEach(function(f){
+    country_codes.forEach(function(f){
       if (d.id==f.CountryCode){
         if(!chosen_states.includes(f.CountryName) && id!="#-99") d3.select(id).style("fill", setColor(d));
       }
@@ -101,7 +101,7 @@ function drawMap() {
 
           if (d.id=="ATA" || d.id=="-99"){ elem.style('fill', "#000000");}
 
-          codeName.forEach(function (f){
+          country_codes.forEach(function (f){
             if (d.id == f.CountryCode) {
               if(!chosen_states.includes(f.CountryName)) elem.style('fill', setColor(d));
               else elem.style('fill', "#FFFF35");
@@ -113,7 +113,7 @@ function drawMap() {
           var temp=[];
           elem=d3.select(this) 
 
-          codeName.forEach(function (f){
+          country_codes.forEach(function (f){
             if (d.id == f.CountryCode) {
 
               if(chosen_states.includes(f.CountryName)) {
@@ -247,7 +247,7 @@ function createLineChart(state){
 
               createLineChart()
 
-              codeName.forEach(function(f){
+              country_codes.forEach(function(f){
                 
                 if (state==f.CountryName){
                   a={id:f.CountryCode};
@@ -280,6 +280,58 @@ function loadMap(){
   });
 }
 
+
+function create_index(){
+
+  console.log(continent_area)
+  d3.select("#continents")
+      .selectAll(".dropdown")
+      .each(function(){
+          id=this.id;
+          d3.select(this)
+            .select(".dropdown-content")
+            .selectAll(".area")
+            .data(continent_area.filter(function(d){
+              if(d.continent.toLowerCase().includes(id))
+                return d;
+              }))
+            .enter()
+            .append("div")
+            .classed("area",true)
+            .each(function(d){
+              area=d3.select(this);
+              area
+                .append("div")
+                .classed("area-name",true)
+                .attr("id",function(d){return d.area.replace(/ /g,"-")})
+                .text(function(d){return d.area});
+              area
+                .append("div")
+                .classed("dropdown-content-2",true)
+                .attr("id",function(d){return d.area.replace(/ /g,"-")})
+                .selectAll(".state")
+                .data(country_area.filter(function(d1){
+                  if(d1.Area==d.area) return d1;
+                }))
+                .enter()
+                .append("div")
+                .classed("state",true)
+                .text(function(d){return d.State;})
+                .on("click", function(d){
+                  state=d.State; show_charts();
+                  })
+              })
+
+      });
+  d3.selectAll(".area")
+      .each(function(){
+
+
+      })
+      .data(country_area)
+}
+
+
 function loadDataMap(){
   var q = d3.queue();
       q.defer(d3.csv,"data/UN_MigrantStockTotal_2017.csv");
@@ -296,14 +348,14 @@ function loadDataMap(){
           loadMap();
           migrantForeachState=file1;
           areaNotConsidered=file2
-          codeName=file3;
-          paesi=file4;
-          continents_area=file5;
-
+          country_codes=file3;
+          country_area=file4;
+          continent_area=file5;
+          
           d3.selectAll(".dropdown-menu").selectAll("li")
           .attr("class", "dropdown-submenu");
       
-      continents_area.forEach(function(d){
+      continent_area.forEach(function(d){
         
         a="#"+(d.area).replace(" ","-");
         var region = d3.select(a);
@@ -316,7 +368,7 @@ function loadDataMap(){
 
         var part=region.append("ul").attr("class", "dropdown-menu");
 
-        paesi.forEach(function(f){
+        country_area.forEach(function(f){
 
           if (f.Area==d.area){
 
@@ -339,19 +391,9 @@ function loadDataMap(){
       })
     })
 
-    
-    $(document).ready(function(){
-        $('.dropdown-submenu a.major-area').on("click", function(e){
-          $(this).next('ul').toggle();
-          e.stopPropagation();
-          e.preventDefault();
-        });
-      });
+          create_index();   
    }
 
       });
-
-      //CODICE NAV BAR
-
-      
+           
   }

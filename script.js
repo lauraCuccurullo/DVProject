@@ -4,35 +4,35 @@ var media;
 var totalEmigrInYear = [];
 var emigrInState = [];
 var emigrInYear = [];
-var ageMigrantStock;
+var age_percentage;
 var agePercentage=[];
-var paesi;
+var country_area;
 var expanded_continents=[];
 var year="2017"
 var state=null;
 var chosen_states=[]
 var threshold=0;
-var emigrates;
-var immigrates;
-var immigratesFemale;
-var immigratesMale;
+var emigrants;
+var immigrants;
+var immigrantsFemale;
+var immigrantsMale;
 var gender_percentage;
 
 function changeInput(){
-    if(document.getElementById("immigration").checked){
-          allMigrantStock=immigrates;
+    if(document.getElementById("check").checked){
+          allMigrantStock=immigrants;
     }
     else{
-      allMigrantStock=emigrates;
+      allMigrantStock=emigrants;
     }
 
     show_charts();
 }
 
 function changeGender(){
-  if (document.getElementById("both").checked) allMigrantStock=immigrates;
-  else if (document.getElementById("male").checked) allMigrantStock=immigratesMale;
-  else allMigrantStock=immigratesFemale;
+  if (document.getElementById("both").checked) allMigrantStock=immigrants;
+  else if (document.getElementById("male").checked) allMigrantStock=immigrantsMale;
+  else allMigrantStock=immigrantsFemale;
   show_charts();
 }
 
@@ -69,7 +69,7 @@ function drawMap(world) {
         .on("mouseout", function(){
                 d3.select(this).style('fill', "grey")})
         .on("click", function(d){
-                codeName.forEach(function (f){
+                country_codes.forEach(function (f){
                   if (d.id == f.CountryCode) {state=f.CountryName; return show_charts();}
                 })
         });
@@ -92,6 +92,8 @@ function create_charts(){
 }
 
 function show_charts(y){
+  console.log("show")
+
     year=y||year;
     if (!state) return;
 
@@ -106,7 +108,7 @@ function show_charts(y){
     var maxMigr = d3.max(emigrInYear, function (d) {return d.migrant_number;})
 
     d3.select("#barInput")
-      .attr("min", 0)
+      .attr("min", parseInt(media))
       .attr("max", d3.max(emigrInYear, function (d) {return d.migrant_number;}))
 
     create_charts();
@@ -171,7 +173,7 @@ function update_state(){
 
             }
         });
-    ageMigrantStock.forEach(function(d){
+    age_percentage.forEach(function(d){
     
       if(d.MajorArea==state && d.Year==year){
           agePercentage.push(d.sectionOne)
@@ -561,6 +563,54 @@ function createPieChartGender(){
     });;
 }
 
+function create_index(){
+  d3.select("#continents")
+      .selectAll(".dropdown")
+      .each(function(){
+          id=this.id;
+          d3.select(this)
+            .select(".dropdown-content")
+            .selectAll(".area")
+            .data(continent_area.filter(function(d){
+              if(d.continent.toLowerCase().includes(id))
+                return d;
+              }))
+            .enter()
+            .append("div")
+            .classed("area",true)
+            .each(function(d){
+              area=d3.select(this);
+              area
+                .append("div")
+                .classed("area-name",true)
+                .attr("id",function(d){return d.area.replace(/ /g,"-")})
+                .text(function(d){return d.area});
+              area
+                .append("div")
+                .classed("dropdown-content-2",true)
+                .attr("id",function(d){return d.area.replace(/ /g,"-")})
+                .selectAll(".state")
+                .data(country_area.filter(function(d1){
+                  if(d1.Area==d.area) return d1;
+                }))
+                .enter()
+                .append("div")
+                .classed("state",true)
+                .text(function(d){return d.State;})
+                .on("click", function(d){
+                  state=d.State; show_charts();
+                  })
+              })
+
+      });
+  d3.selectAll(".area")
+      .each(function(){
+
+
+      })
+      .data(country_area)
+}
+
 //SCELTA E MODIFICA PARAMETRI
 function loadData(){
   var q = d3.queue();
@@ -582,23 +632,23 @@ function loadData(){
         }
         else {
 
-          emigrates=file1;
-          immigrates=file5;
-          immigratesMale=file10;
-          immigratesFemale=file11;
+          emigrants=file1;
+          immigrants=file5;
+          immigrantsMale=file10;
+          immigrantsFemale=file11;
           allMigrantStock=file1;
           file2.forEach(function(d){
             areaNotConsidered.push(d.MajorArea)
           })
-          paesi=file3;
-          codeName=file6;
-          continents_area=file7;
+          country_area=file3;
+          country_codes=file6;
+          continent_area=file7;
           drawMap(file4);
 
-          ageMigrantStock=file8;
+          age_percentage=file8;
           gender_percentage=file9;
 
-          ageMigrantStock.forEach(function (d) {
+          age_percentage.forEach(function (d) {
 
             d.sectionOne= +(d["0-4"]);
             d.sectionOne+= +(d["5-9"]);
@@ -626,57 +676,58 @@ function loadData(){
 
           })
 
-          d3.selectAll(".dropdown-menu").selectAll("li")
-          .attr("class", "dropdown-submenu");
+          // d3.selectAll(".dropdown-menu").selectAll("li")
+          // .attr("class", "dropdown-submenu");
       
-          continents_area.forEach(function(d){
+          // continent_area.forEach(function(d){
             
-            a="#"+(d.area).replace(" ","-");
-            var region = d3.select(a);
+          //   a="#"+(d.area).replace(" ","-");
+          //   var region = d3.select(a);
 
-            region.append("a")
-              .attr("href", "#")
-              .attr("tabindex", "-1")
-              .attr("class", "major-area")
-              .text(d.area);
+          //   region.append("a")
+          //     .attr("href", "#")
+          //     .attr("tabindex", "-1")
+          //     .attr("class", "major-area")
+          //     .text(d.area);
 
-            var part=region.append("ul").attr("class", "dropdown-menu");
+          //   var part=region.append("ul").attr("class", "dropdown-menu");
 
-            paesi.forEach(function(f){
+          //   country_area.forEach(function(f){
 
-              if (f.Area==d.area){
+          //     if (f.Area==d.area){
 
-                nation=(f.State).replace(" ","-");
+          //       nation=(f.State).replace(" ","-");
 
-                part.append("li")
-                .attr("id", nation)
-                .attr("class", "dropdown-submenu")
-                .append("a")
-                .attr("href", "#")
-                .attr("tabindex", "-1")
-                .text(f.State)
-                .on("click", function(){
-                  state=f.State; show_charts();
-                })
-                }
-              })
-            })
+          //       part.append("li")
+          //       .attr("id", nation)
+          //       .attr("class", "dropdown-submenu")
+          //       .append("a")
+          //       .attr("href", "#")
+          //       .attr("tabindex", "-1")
+          //       .text(f.State)
+          //       .on("click", function(){
+          //         state=f.State; show_charts();
+          //       })
+          //       }
+          //     })
+          //   })
     
-    $(document).ready(function(){
-        $('.dropdown-submenu a.major-area').on("click", function(e){
-          $(this).next('ul').toggle();
-          e.stopPropagation();
-          e.preventDefault();
-        });
-      });
+    // $(document).ready(function(){
+    //     $('.dropdown-submenu a.major-area').on("click", function(e){
+    //       $(this).next('ul').toggle();
+    //       e.stopPropagation();
+    //       e.preventDefault();
+    //     });
+    //   });
 
     d3.select("#barInput").on("input", function(){
       threshold = $("#barInput").val();
-      //console.log(threshold +"  c  "+ media)
       update_state()
       update_year();
       create_charts();
    });
+
+    create_index();
 
   }}
   )

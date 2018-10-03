@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+          <link rel="stylesheet" href="style0.css">
 </head>
 
 <body onload="loadDataMap();">
@@ -22,7 +22,59 @@
     <div id="index2"></div>
 </header>
 
-<nav class="navbar navbar-default">
+
+  <nav>
+    <ul id="navbar">
+      <li id="title">Migrant Stock</li>
+      <li class="navbar-1" id="continents">
+        <ul>
+          <li class="dropdown" id="europe">
+            <div class="navbar-2">Europe</div>
+            <div class=dropdown-content>
+            </div>
+          </li>
+          <li class="dropdown" id="africa">
+            <div class="navbar-2">Africa</div>
+            <div class=dropdown-content>
+            </div>
+          </li>
+          <li class="dropdown" id="asia">
+            <div  class="navbar-2">Asia</div>
+            <div class=dropdown-content>
+            </div>
+          </li>
+          <li class="dropdown" id="america">
+            <div  class="navbar-2">America</div>
+            <div class=dropdown-content>
+            </div>
+          </li>
+          <li class="dropdown" id="oceania">
+            <div  class="navbar-2">Oceania</div>
+            <div class=dropdown-content>
+            </div>
+          </li>
+        </ul>
+      </li>
+      <li class="navbar-1" id="other">
+        <ul>
+          <li class="dropdown" id="years">
+            <div class="navbar-2">Years</div>
+            <div class=dropdown-content>
+              <div class="year"  onclick="show_charts('1990')">1990</div>
+              <div class="year"  onclick="show_charts('1995')">1995</div>
+              <div class="year"  onclick="show_charts('2000')">2000</div>
+              <div class="year" onclick="show_charts('2005')">2005</div>
+              <div class="year" onclick="show_charts('2010')">2010</div>
+              <div class="year" onclick="show_charts('2015')">2015</div>
+              <div class="year" onclick="show_charts('2017')">2017</div>
+            </div>
+          <li class="navbar-2" id="page2"><a href="Index.html">Page2</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+<!-- <nav class="navbar navbar-default">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -94,7 +146,7 @@
     </div>
   </div>
 </nav>
-
+ -->
 <div id="map-containers" class="view">
     <svg id="map" width="100%" height="100%">
     </svg>
