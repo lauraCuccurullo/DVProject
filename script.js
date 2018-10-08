@@ -20,17 +20,19 @@ var gender_percentage;
 
 function changeInput(){
     if(document.getElementById("check").checked){
-          allMigrantStock=immigrants;
+          allMigrantStock=emigrants;
+          d3.select("#genre").classed("invisible", false)
     }
     else{
-      allMigrantStock=emigrants;
+      allMigrantStock=immigrants;
+      d3.select("#genre").classed("invisible", true)
     }
 
     show_charts();
 }
 
 function changeGender(){
-  if (document.getElementById("both").checked) allMigrantStock=immigrants;
+  if (document.getElementById("both").checked) allMigrantStock=emigrants;
   else if (document.getElementById("male").checked) allMigrantStock=immigrantsMale;
   else allMigrantStock=immigrantsFemale;
   show_charts();

@@ -82,8 +82,14 @@
     fill:yellow;
 }
 
+path{
+    cursor: pointer;
+}
+
 a{
     cursor: pointer;
+    text-decoration: none;
+    color: black;
 }
 
 @font-face {

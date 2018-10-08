@@ -62,7 +62,8 @@ function setColor(d){
         if (f.MajorArea==nameCountry) result=f[selectedYear];
     })
 
-    return colorScale(result);
+    if (d.id=="ATA") {(d3.select("#ATA").style("fill", "white")); console.log("ciao")}
+    else return colorScale(result);
 }
 
 function color_change(){
@@ -99,7 +100,7 @@ function drawMap() {
           
           elem=d3.select(this)
 
-          if (d.id=="ATA" || d.id=="-99"){ elem.style('fill', "#000000");}
+          if (d.id=="ATA" || d.id=="-99"){ elem.style('fill', " #f0e68c");}
 
           country_codes.forEach(function (f){
             if (d.id == f.CountryCode) {

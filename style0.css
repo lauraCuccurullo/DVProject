@@ -6,6 +6,7 @@
   margin: 0;
   padding: 0;
 }
+
 body{
   font-family:"Arial";
 }
@@ -50,9 +51,6 @@ li{
 }
 #other{
   float:right;
-}
-#page2{
-  font-weight: bold;
 }
 .dropdown-content{
   font-size: 10px;

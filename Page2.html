@@ -5,24 +5,14 @@
     <meta charset="UTF-8">
     <title>Data Visualisation</title>
     <link rel="stylesheet" href="style2.css?version=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script type="text/javascript" src="d3/d3.js"></script>
     <script type="text/javascript" src="d3/d3-selection-multi.js"></script>
     <script type="text/javascript" src="d3/topojson.js"></script>
     <script type="application/javascript" src="script2.js?version=1"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-          <link rel="stylesheet" href="style0.css">
+    <link rel="stylesheet" href="style0.css">
 </head>
 
 <body onload="loadDataMap();">
-
-<header id="index-container" class="view">
-    <div id="index2"></div>
-</header>
-
-
   <nav>
     <ul id="navbar">
       <li id="title">Migrant Stock</li>
@@ -60,93 +50,20 @@
           <li class="dropdown" id="years">
             <div class="navbar-2">Years</div>
             <div class=dropdown-content>
-              <div class="year"  onclick="show_charts('1990')">1990</div>
-              <div class="year"  onclick="show_charts('1995')">1995</div>
-              <div class="year"  onclick="show_charts('2000')">2000</div>
-              <div class="year" onclick="show_charts('2005')">2005</div>
-              <div class="year" onclick="show_charts('2010')">2010</div>
-              <div class="year" onclick="show_charts('2015')">2015</div>
-              <div class="year" onclick="show_charts('2017')">2017</div>
+              <div class="year"  onclick="change_year('1990')">1990</div>
+              <div class="year"  onclick="change_year('1995')">1995</div>
+              <div class="year"  onclick="change_year('2000')">2000</div>
+              <div class="year" onclick="change_year('2005')">2005</div>
+              <div class="year" onclick="change_year('2010')">2010</div>
+              <div class="year" onclick="change_year('2015')">2015</div>
+              <div class="year" onclick="change_year('2017')">2017</div>
             </div>
-          <li class="navbar-2" id="page2"><a href="Index.html">Page2</a></li>
+          <li class="navbar-2" id="page1"><a href="Index.html">Single State</a></li>
         </ul>
       </li>
     </ul>
   </nav>
 
-<!-- <nav class="navbar navbar-default">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-      </button>
-      <a class="navbar-brand" href="#">Migrant</a>
-    </div>
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-        <li class="dropdown">
-          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">America</a>
-          <ul class="dropdown-menu">
-            <li id ="Latin-America-and-the-Caribbean"></li>
-            <li id ="Central-America"></li>
-            <li id ="South-America"></li>
-            <li id ="Northern-America"></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Europe</a>
-          <ul class="dropdown-menu">
-            <li id="Eastern-Europe" ></li>
-            <li id="Northern-Europe"></li>
-            <li id="Southern-Europe"></li>
-            <li id="Western-Europe" ></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Africa</a>
-          <ul class="dropdown-menu">
-            <li id="Eastern-Africa"></li>
-            <li id="Northern-Africa"></li>
-            <li id="Middle-Africa" ></li>
-            <li id="Western-Africa"></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Asia</a>
-          <ul class="dropdown-menu">
-            <li id="Eastern-Asia"></li>
-            <li id="Central-Asia"></li>
-            <li id="South-Eastern-Asia"></li>
-            <li id="Western-Asia"></li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Oceania</a>
-          <ul class="dropdown-menu">
-            <li id="Oceania"></li>
-          </ul>
-        </li>
-      </ul>
-      <ul  class="nav navbar-nav">
-        <li class="dropdown">
-           <a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Years</a>
-          <ul class="dropdown-menu">
-            <li> <a onclick="change_year('1990')">1990</a>  </li>
-            <li> <a onclick="change_year('1995')">1995</a>  </li>
-            <li> <a onclick="change_year('2000')">2000</a>  </li>
-            <li> <a onclick="change_year('2005')">2005</a>  </li>
-            <li> <a onclick="change_year('2010')">2010</a>  </li>
-            <li> <a onclick="change_year('2015')">2015</a>  </li>
-            <li> <a onclick="change_year('2017')">2017</a>  </li>
-          </ul>
-        </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="index.html">Page 1</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
- -->
 <div id="map-containers" class="view">
     <svg id="map" width="100%" height="100%">
     </svg>
