@@ -491,7 +491,7 @@ function createPieChart(){
          .attr("id", "tooltip-pie")
          .style("left", xPosition+'px')
          .style("top", yPosition+'px')
-         .text("The percentage is "+ d.value+"%");
+         .text(d.value+"%");
 
     })
     .on("mouseout", function(d){
