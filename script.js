@@ -78,7 +78,7 @@ function drawMap(world) {
 
 function hide_charts(){
     d3.select("#chart-container").classed("invisible",true);
-    d3.select("#map-container")       
+    d3.select("#map-container")
      .transition()
      .duration(1000)
      .style("opacity", "1");
@@ -100,7 +100,7 @@ function show_charts(y){
     update_state()
     update_year();
     d3.select("#chart-container").classed("invisible",false);
-    d3.select("#map-container")       
+    d3.select("#map-container")
      .transition()
      .duration(1000)
      .style("opacity", "0.3");
@@ -174,7 +174,7 @@ function update_state(){
             }
         });
     age_percentage.forEach(function(d){
-    
+
       if(d.MajorArea==state && d.Year==year){
           agePercentage.push(d.sectionOne)
           agePercentage.push(d.sectionTwo)
@@ -233,6 +233,8 @@ function createBarChart(){
         .data(emigrInYear)
         .classed("rect",true)
         .on("click",function(d){
+              d3.select(this)
+              .classed("hide",false);
               new_line(d.migrant_area);
               line = d3.select(getId(d.migrant_area,"line"))
               line.classed("highlight", !line.classed("highlight"));
@@ -329,11 +331,11 @@ function new_line(chosenState){
             })
         .on("click",function(){
               chosen_states.splice(chosen_states.indexOf(chosenState), 1 )
-              
               d3.select(this)
                 .remove();
               d3.select(getId(chosenState, "bar"))
-              .classed("lineHover", false);
+              .classed("lineHover", false)
+              .classed("hide",true);
               d3.select("#tooltip").remove();
             })
         .style("opacity", "0.1")
@@ -500,7 +502,7 @@ function createPieChartGender(){
     gender_percentage.forEach(function(d){
       if(d.MajorArea==state){
         female=+((d[year]).replace(",","."))
-        perc.push(female); 
+        perc.push(female);
         perc.push(100-female);
       }
     })
@@ -548,7 +550,7 @@ function createPieChartGender(){
         var x = coordinates[0];
         var y = coordinates[1];
 
-        var xPosition = d3.event.pageX - svgPieBounds.x 
+        var xPosition = d3.event.pageX - svgPieBounds.x
         var yPosition = d3.event.pageY - svgPieBounds.y +240
 
       d3.select("#pie-chart").insert("span", "svg")
@@ -678,9 +680,9 @@ function loadData(){
 
           // d3.selectAll(".dropdown-menu").selectAll("li")
           // .attr("class", "dropdown-submenu");
-      
+
           // continent_area.forEach(function(d){
-            
+
           //   a="#"+(d.area).replace(" ","-");
           //   var region = d3.select(a);
 
@@ -711,7 +713,7 @@ function loadData(){
           //       }
           //     })
           //   })
-    
+
     // $(document).ready(function(){
     //     $('.dropdown-submenu a.major-area').on("click", function(e){
     //       $(this).next('ul').toggle();
