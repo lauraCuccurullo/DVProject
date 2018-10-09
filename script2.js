@@ -61,8 +61,7 @@ function setColor(d){
     migrantForeachState.forEach(function (f){
         if (f.MajorArea==nameCountry) result=f[selectedYear];
     })
-
-    if (d.id=="ATA") {(d3.select("#ATA").style("fill", "white")); console.log("ciao")}
+    if (d.id=="ATA" || d.id=="-99") return "#f0e68c";
     else return colorScale(result);
 }
 
@@ -95,12 +94,10 @@ function drawMap() {
         .attr("d", path)
         .style('fill', setColor)
         .on("mouseover", function(d,i){
-                d3.select(this).style("fill", "#ffa07a")})
+                if (d.id!="ATA" && d.id!="-99") d3.select(this).style("fill", "#ffa07a")})
         .on("mouseout", function(d){
-          
-          elem=d3.select(this)
 
-          if (d.id=="ATA" || d.id=="-99"){ elem.style('fill', " #f0e68c");}
+          elem=d3.select(this)
 
           country_codes.forEach(function (f){
             if (d.id == f.CountryCode) {
@@ -108,25 +105,25 @@ function drawMap() {
               else elem.style('fill', "#FFFF35");
             }
           })
-        })                
+        })
         .on("click", function(d){
 
           var temp=[];
-          elem=d3.select(this) 
+          elem=d3.select(this)
 
           country_codes.forEach(function (f){
             if (d.id == f.CountryCode) {
 
               if(chosen_states.includes(f.CountryName)) {
                 elem.style('fill', setColor(d));
-                chosen_states.splice(chosen_states.indexOf(f.CountryName), 1 )  
+                chosen_states.splice(chosen_states.indexOf(f.CountryName), 1 )
                 allSelectedData.forEach(function(d){
                   if(d.migrant_Area!=f.CountryName) temp.push(d);
-                })             
+                })
                allSelectedData=temp;
                d3.select(getId(f.CountryName)).remove();
               }
-              else{ 
+              else{
                 elem.style('fill', "#FFFF35");
                 lastSelectedData=[];
                 select_state(f.CountryName);
@@ -142,7 +139,7 @@ function new_line(state){
 
   if(!chosen_states.includes(state)){
         chosen_states.push(state)
-        
+
         createLineChart(state);
     }
 }
@@ -194,7 +191,7 @@ function createLineChart(state){
     d3.select("#xLineAxis").selectAll("text")
         .on("click",function(d){console.log(d); change_year(d)})
         .attr("cursor","pointer");
-    
+
     d3.select("#yLineAxis").append("g")
         .classed("grat",true)
         .call(d3.axisLeft().scale(yLineScale)
@@ -213,7 +210,7 @@ function createLineChart(state){
     })
 
     d3.select("#lines")
-        .append("path") 
+        .append("path")
         .on("mouseover",function(){
 
               var coordinates = [0, 0];
@@ -249,7 +246,7 @@ function createLineChart(state){
               createLineChart()
 
               country_codes.forEach(function(f){
-                
+
                 if (state==f.CountryName){
                   a={id:f.CountryCode};
                   d3.select("#map-containers").select("#"+f.CountryCode).style("fill", setColor(a));
@@ -264,7 +261,7 @@ function createLineChart(state){
               //console.log(state)
 
               //colore della mappa
-            }) 
+            })
         .attr("class", "line")
         .attr('id', newId(state))
         .attr("d", xLineGenerator(lastSelectedData))
@@ -352,12 +349,12 @@ function loadDataMap(){
           country_codes=file3;
           country_area=file4;
           continent_area=file5;
-          
+
           d3.selectAll(".dropdown-menu").selectAll("li")
           .attr("class", "dropdown-submenu");
-      
+
       continent_area.forEach(function(d){
-        
+
         a="#"+(d.area).replace(" ","-");
         var region = d3.select(a);
 
@@ -392,9 +389,9 @@ function loadDataMap(){
       })
     })
 
-          create_index();   
+          create_index();
    }
 
       });
-           
+
   }

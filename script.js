@@ -11,7 +11,7 @@ var expanded_continents=[];
 var year="2017"
 var state=null;
 var chosen_states=[]
-var threshold=0;
+var threshold=null;
 var emigrants;
 var immigrants;
 var immigrantsFemale;
@@ -19,6 +19,7 @@ var immigrantsMale;
 var gender_percentage;
 
 function changeInput(){
+    console.log("changeInput")
     if(document.getElementById("check").checked){
           allMigrantStock=emigrants;
           d3.select("#genre").classed("invisible", false)
@@ -32,6 +33,7 @@ function changeInput(){
 }
 
 function changeGender(){
+  console.log("changeGender")
   if (document.getElementById("both").checked) allMigrantStock=emigrants;
   else if (document.getElementById("male").checked) allMigrantStock=immigrantsMale;
   else allMigrantStock=immigrantsFemale;
@@ -72,14 +74,17 @@ function drawMap(world) {
                 d3.select(this).style('fill', "grey")})
         .on("click", function(d){
                 country_codes.forEach(function (f){
-                  if (d.id == f.CountryCode) {state=f.CountryName; return show_charts();}
+                  if (d.id == f.CountryCode) {state=f.CountryName; console.log("click map"); return show_charts();}
                 })
         });
 
 }
 
 function hide_charts(){
-    d3.select("#chart-container").classed("invisible",true);
+    threshold=null;
+    d3.select("#chart-container")
+      .classed("invisible",true)
+     .style("background-color", "rgba(20,50,50,0)");
     d3.select("#map-container")
      .transition()
      .duration(1000)
@@ -87,36 +92,45 @@ function hide_charts(){
 }
 
 function create_charts(){
+    console.log("create_charts")
     createBarChart();
     createLineChart();
     createPieChart()
     createPieChartGender()
-}
+    console.log("media is"+media)
+    d3.select("#slider")
+          .attr("min", 500)
+          .attr("max", d3.max(emigrInYear, function (d) {return d.migrant_number;}))
+          .attr("value",parseInt(media));
+  }
 
 function show_charts(y){
-  console.log("show")
-
+    console.log("show_charts")
     year=y||year;
     if (!state) return;
 
     update_state()
     update_year();
-    d3.select("#chart-container").classed("invisible",false);
+    d3.select("#chart-container")
+      .classed("invisible",false)
+      .transition()
+      .duration(1000)
+      .style("background-color", "rgba(20,50,50,0.1)");
+      ;
     d3.select("#map-container")
      .transition()
      .duration(1000)
      .style("opacity", "0.3");
-
+    console.log("slider media becomes "+media)
+    document.getElementById("slider").value=media;
     var maxMigr = d3.max(emigrInYear, function (d) {return d.migrant_number;})
-
-    d3.select("#barInput")
-      .attr("min", parseInt(media))
-      .attr("max", d3.max(emigrInYear, function (d) {return d.migrant_number;}))
 
     create_charts();
 }
 
 function update_year(){
+  console.log("update_year")
+
   d3.selectAll(".selected-year")
       .text(year);
   emigrInYear=[];
@@ -128,6 +142,8 @@ function update_year(){
 }
 
 function update_state(){
+  console.log("update_state")
+
     d3.selectAll(".selected-country")
         .text(state);
     d3.select("#country-line")
@@ -153,13 +169,13 @@ function update_state(){
         });
 
         media=somma/count;
-
-        var statesInMedia=[];
+        threshold=threshold==null?media:threshold;
+        var statesInThreshold=[];
 
         allMigrantStock.forEach(function (d) {
 
-            if(d[state]>=(media) && d[state]>=threshold && !(statesInMedia.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea))){
-                statesInMedia.push(d.MajorArea);
+            if(d[state]>=threshold && !(statesInThreshold.includes(d.MajorArea)) && !(areaNotConsidered.includes(d.MajorArea))){
+                statesInThreshold.push(d.MajorArea);
               }
         });
 
@@ -169,7 +185,7 @@ function update_state(){
                 totalEmigrInYear.push({ migrant_number: d[state], migrant_year: d.Year})
             }
 
-            if(statesInMedia.includes(d.MajorArea)){
+            if(statesInThreshold.includes(d.MajorArea)){
 
                 emigrInState.push({migrant_number: d[state], migrant_area: d.MajorArea, migrant_year: d.Year});
 
@@ -409,28 +425,6 @@ function createLineChart(){
     states=[];
     emigrInState.forEach(function(d){if(!states.includes(d.migrant_area)) states.push(d.migrant_area);});
     states.forEach(function(d){new_line(d)});
-           //
-           // var xLineScale = d3.scaleTime()
-           //     .domain([d3.min(totalEmigrInYear, function (d) {
-           //         return new Date(d.migrant_year,0,1,0);
-           //     }), d3.max(totalEmigrInYear, function (d) {
-           //         return new Date(d.migrant_year,0,1,0);
-           //     })])
-           //     .range([xLinepad,svgLineBounds.width-xLinepad]);
-           //
-           // var yLineScale = d3.scaleLinear()
-           //     .domain([0, d3.max(totalEmigrInYear, function (d) {
-           //         return d.migrant_number;
-           //     })])
-           //     .range([svgLineBounds.height-yLinepad, yLinepad]);
-           //
-           // xLineGenerator = d3.line()
-           //     .x(function (d) {
-           //         return (xLineScale(new Date(d.migrant_year,0,1,0)));
-           //     })
-           //     .y(function (d) {
-           //         return (yLineScale(d.migrant_number));
-           //     });
 }
 function createPieChart(){
 
@@ -602,7 +596,10 @@ function create_index(){
                 .classed("state",true)
                 .text(function(d){return d.State;})
                 .on("click", function(d){
-                  state=d.State; show_charts();
+                  console.log("click nav")
+                  threshold=null;
+                  state=d.State;
+                  show_charts();
                   })
               })
 
@@ -680,57 +677,13 @@ function loadData(){
 
           })
 
-          // d3.selectAll(".dropdown-menu").selectAll("li")
-          // .attr("class", "dropdown-submenu");
-
-          // continent_area.forEach(function(d){
-
-          //   a="#"+(d.area).replace(" ","-");
-          //   var region = d3.select(a);
-
-          //   region.append("a")
-          //     .attr("href", "#")
-          //     .attr("tabindex", "-1")
-          //     .attr("class", "major-area")
-          //     .text(d.area);
-
-          //   var part=region.append("ul").attr("class", "dropdown-menu");
-
-          //   country_area.forEach(function(f){
-
-          //     if (f.Area==d.area){
-
-          //       nation=(f.State).replace(" ","-");
-
-          //       part.append("li")
-          //       .attr("id", nation)
-          //       .attr("class", "dropdown-submenu")
-          //       .append("a")
-          //       .attr("href", "#")
-          //       .attr("tabindex", "-1")
-          //       .text(f.State)
-          //       .on("click", function(){
-          //         state=f.State; show_charts();
-          //       })
-          //       }
-          //     })
-          //   })
-
-    // $(document).ready(function(){
-    //     $('.dropdown-submenu a.major-area').on("click", function(e){
-    //       $(this).next('ul').toggle();
-    //       e.stopPropagation();
-    //       e.preventDefault();
-    //     });
-    //   });
-
-    d3.select("#barInput").on("input", function(){
-      threshold = $("#barInput").val();
-      update_state()
-      update_year();
-      create_charts();
-   });
-
+          d3.select("#slider").on("input", function(){
+            console.log("slideeer")
+            threshold = this.value;
+            update_state()
+            update_year();
+            create_charts();
+          });
     create_index();
 
   }}

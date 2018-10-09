@@ -1,8 +1,14 @@
 #chart-container{
     position: absolute;
     top:8%;
-    width:100%;
+    width:98%;
     height:90%;
+    background-color: rgba(20,50,50,0);
+    border:2px solid black;
+    border-radius:20px;
+    left:1%;
+    right:1%;
+    padding: 2px;
 }
 
 #map-container{
@@ -24,8 +30,11 @@
 #range{
     position: absolute;
     left:62%;
-    height:5%;
-    width:28%;
+    height:10%;
+    width:35%;
+}
+#slider{
+  width:100%;
 }
 #genre{
     position: absolute;
