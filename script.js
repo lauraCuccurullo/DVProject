@@ -19,7 +19,6 @@ var immigrantsMale;
 var gender_percentage;
 
 function changeInput(){
-    console.log("changeInput")
     if(document.getElementById("check").checked){
           allMigrantStock=emigrants;
           d3.select("#genre").classed("invisible", false)
@@ -33,10 +32,9 @@ function changeInput(){
 }
 
 function changeGender(){
-  console.log("changeGender")
-  if (document.getElementById("both").checked) allMigrantStock=emigrants;
-  else if (document.getElementById("male").checked) allMigrantStock=immigrantsMale;
-  else allMigrantStock=immigrantsFemale;
+  if (document.getElementById("both").checked) {allMigrantStock=emigrants; age_percentage=age_percentageBoth;}
+  else if (document.getElementById("male").checked) {allMigrantStock=immigrantsMale; age_percentage=age_percentageMale }
+  else {allMigrantStock=immigrantsFemale; age_percentage=age_percentageFemale }
   show_charts();
 }
 
@@ -74,7 +72,7 @@ function drawMap(world) {
                 d3.select(this).style('fill', "grey")})
         .on("click", function(d){
                 country_codes.forEach(function (f){
-                  if (d.id == f.CountryCode) {state=f.CountryName; console.log("click map"); return show_charts();}
+                  if (d.id == f.CountryCode) {state=f.CountryName; return show_charts();}
                 })
         });
 
@@ -92,12 +90,10 @@ function hide_charts(){
 }
 
 function create_charts(){
-    console.log("create_charts")
     createBarChart();
     createLineChart();
     createPieChart()
     createPieChartGender()
-    console.log("media is"+media)
     d3.select("#slider")
           .attr("min", 500)
           .attr("max", d3.max(emigrInYear, function (d) {return d.migrant_number;}))
@@ -105,7 +101,6 @@ function create_charts(){
   }
 
 function show_charts(y){
-    console.log("show_charts")
     year=y||year;
     if (!state) return;
 
@@ -121,7 +116,6 @@ function show_charts(y){
      .transition()
      .duration(1000)
      .style("opacity", "0.3");
-    console.log("slider media becomes "+media)
     document.getElementById("slider").value=media;
     var maxMigr = d3.max(emigrInYear, function (d) {return d.migrant_number;})
 
@@ -129,8 +123,6 @@ function show_charts(y){
 }
 
 function update_year(){
-  console.log("update_year")
-
   d3.selectAll(".selected-year")
       .text(year);
   emigrInYear=[];
@@ -142,8 +134,6 @@ function update_year(){
 }
 
 function update_state(){
-  console.log("update_state")
-
     d3.selectAll(".selected-country")
         .text(state);
     d3.select("#country-line")
@@ -191,6 +181,7 @@ function update_state(){
 
             }
         });
+
     age_percentage.forEach(function(d){
 
       if(d.MajorArea==state && d.Year==year){
@@ -200,6 +191,7 @@ function update_state(){
           agePercentage.push(d.sectionFour)
       }
     })
+
   chosen_states=[];
   }
 
@@ -553,7 +545,7 @@ function createPieChartGender(){
          .attr("id", "tooltip-pie")
          .style("left", xPosition+'px')
          .style("top", yPosition+'px')
-         .text("The percentage is "+ value+"%");
+         .text(value+"%");
 
     })
     .on("mouseout", function(d){
@@ -596,7 +588,6 @@ function create_index(){
                 .classed("state",true)
                 .text(function(d){return d.State;})
                 .on("click", function(d){
-                  console.log("click nav")
                   threshold=null;
                   state=d.State;
                   show_charts();
@@ -610,6 +601,32 @@ function create_index(){
 
       })
       .data(country_area)
+}
+
+function distributeAge(d){
+    d.sectionOne= +(d["0-4"]);
+    d.sectionOne+= +(d["5-9"]);
+    d.sectionOne+= +(d["10-14"]);
+    d.sectionOne= (Math.round(d.sectionOne*10))/10;
+
+    d.sectionTwo= +(d["15-19"]);
+    d.sectionTwo+= +(d["20-24"]);
+    d.sectionTwo+= +(d["25-29"]);
+    d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
+
+    d.sectionThree= +(d["30-34"]);
+    d.sectionThree+= +(d["35-39"]);
+    d.sectionThree+= +(d["40-44"]);
+    d.sectionThree+= +(d["45-49"]);
+    d.sectionThree+= +(d["50-54"]);
+    d.sectionThree= (Math.round(d.sectionThree*10))/10;
+
+    d.sectionFour= +(d["55-59"]);
+    d.sectionFour+= +(d["60-64"]);
+    d.sectionFour+= +(d["65-69"]);
+    d.sectionFour+= +(d["70-74"]);
+    d.sectionFour+= +(d["75+"]);
+    d.sectionFour= (Math.round(d.sectionFour*10))/10;
 }
 
 //SCELTA E MODIFICA PARAMETRI
@@ -626,7 +643,9 @@ function loadData(){
       q.defer(d3.csv,"data/gender_percentage.csv");
       q.defer(d3.csv,"data/UN_MigrantStockByOriginAndDestination_2017Male.csv");
       q.defer(d3.csv,"data/UN_MigrantStockByOriginAndDestination_2017Female.csv");
-      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8, file9, file10, file11) {
+      q.defer(d3.csv,"data/UN_MigrantStockByAge_2017Female.csv");
+      q.defer(d3.csv,"data/UN_MigrantStockByAge_2017Male.csv");
+      q.await(function(error,file1,file2,file3,file4, file5, file6, file7, file8, file9, file10, file11, file12, file13) {
         if (error){
             console.log(error);
             throw error;
@@ -647,38 +666,26 @@ function loadData(){
           drawMap(file4);
 
           age_percentage=file8;
+          age_percentageBoth=file8;
+          age_percentageFemale=file12;
+          age_percentageMale=file13;
           gender_percentage=file9;
 
           age_percentage.forEach(function (d) {
+              distributeAge(d)
+          })
 
-            d.sectionOne= +(d["0-4"]);
-            d.sectionOne+= +(d["5-9"]);
-            d.sectionOne+= +(d["10-14"]);
-            d.sectionOne= (Math.round(d.sectionOne*10))/10;
+          age_percentageBoth=age_percentage;
 
-            d.sectionTwo= +(d["15-19"]);
-            d.sectionTwo+= +(d["20-24"]);
-            d.sectionTwo+= +(d["25-29"]);
-            d.sectionTwo= (Math.round(d.sectionTwo*10))/10;
+          age_percentageMale.forEach(function (d) {
+           distributeAge(d)
+          })
 
-            d.sectionThree= +(d["30-34"]);
-            d.sectionThree+= +(d["35-39"]);
-            d.sectionThree+= +(d["40-44"]);
-            d.sectionThree+= +(d["45-49"]);
-            d.sectionThree+= +(d["50-54"]);
-            d.sectionThree= (Math.round(d.sectionThree*10))/10;
-
-            d.sectionFour= +(d["55-59"]);
-            d.sectionFour+= +(d["60-64"]);
-            d.sectionFour+= +(d["65-69"]);
-            d.sectionFour+= +(d["70-74"]);
-            d.sectionFour+= +(d["75+"]);
-            d.sectionFour= (Math.round(d.sectionFour*10))/10;
-
+          age_percentageFemale.forEach(function (d) {
+           distributeAge(d)
           })
 
           d3.select("#slider").on("input", function(){
-            console.log("slideeer")
             threshold = this.value;
             update_state()
             update_year();

@@ -214,8 +214,10 @@ header{
 }
 
 #tooltip-pie{
-    width: 150px;
+    padding: 4px;
+    width: 100px;
     position: absolute;
+    text-align: center;
     z-index: 100;
     pointer-events: none;
     font-size: 12px;
